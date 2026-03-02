@@ -1,0 +1,6 @@
+- AntDemo: Corresponde a la demo de ant con el build.xml.
+- demo-maven: Carpeta generada mediante la opción 1: Crear un proyecto desde consola con el arquetipo maven-archetype-quickstart.
+- demo-maven-eclipse: Carpeta generada mediante la opción 2: Crear un proyecto directamente Eclipse integrado con Maven. Una
+vez integrado compilar, generar la documentación y empaquetar los binarios en un fichero .jar. 
+- proyecto_maven_prueba: Carpeta generada mediante la opción 3: Convertir un proyecto Eclipse tradicional en uno Maven con la opción del menú contextual
+sobre el proyecto Configure>Convert to Maven Project.
