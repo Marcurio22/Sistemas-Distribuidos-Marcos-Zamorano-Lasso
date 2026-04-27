@@ -7,66 +7,83 @@
     <link rel="stylesheet" th:href="@{/css/tailwind.css}">
 </head>
 <body class="page-shell">
-<main class="page-main">
-    <div class="page-container max-w-3xl">
-        <div class="page-card">
-            <div class="page-card-body">
-                <h1 class="section-title text-3xl md:text-5xl">Iniciar sesión</h1>
-                <p class="section-subtitle">Acceso al entorno de pruebas de la práctica.</p>
+<div class="drawer">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle">
 
-                <div th:if="${param.error}" class="alert alert-error mt-2">
-                    <span>Usuario o contraseña incorrectos.</span>
-                </div>
+    <div class="drawer-content flex min-h-screen flex-col">
+        <label for="main-drawer" class="menu-fab" aria-label="Abrir menú">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </label>
 
-                <div th:if="${param.logout}" class="alert alert-success mt-2">
-                    <span>Se ha cerrado la sesión correctamente.</span>
-                </div>
+        <main class="page-main">
+            <div class="page-container max-w-3xl">
+                <div class="page-card">
+                    <div class="page-card-body">
+                        <h1 class="section-title text-3xl md:text-5xl">Iniciar sesión</h1>
+                        <p class="section-subtitle">Acceso al entorno de pruebas de la práctica.</p>
 
-                <div th:if="${param.registered}" class="alert alert-success mt-2">
-                    <span>La cuenta se ha creado correctamente. Ya puedes iniciar sesión.</span>
-                </div>
+                        <div th:if="${param.error}" class="alert alert-error mt-2">
+                            <span>Usuario o contraseña incorrectos.</span>
+                        </div>
 
-                <form method="post" th:action="@{/login}" class="mt-4 space-y-4">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div th:if="${param.logout}" class="alert alert-success mt-2">
+                            <span>Se ha cerrado la sesión correctamente.</span>
+                        </div>
 
-                    <div class="form-control">
-                        <label class="label" for="username">
-                            <span class="label-text text-base font-semibold">Usuario</span>
-                        </label>
-                        <input id="username" name="username" type="text" required class="input input-bordered input-lg w-full">
-                    </div>
+                        <div th:if="${param.registered}" class="alert alert-success mt-2">
+                            <span>La cuenta se ha creado correctamente. Ya puedes iniciar sesión.</span>
+                        </div>
 
-                    <div class="form-control">
-                        <label class="label" for="password">
-                            <span class="label-text text-base font-semibold">Contraseña</span>
-                        </label>
-                        <input id="password" name="password" type="password" required class="input input-bordered input-lg w-full">
-                    </div>
+                        <form method="post" th:action="@{/login}" class="mt-4 space-y-4">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                    <div class="mt-8">
-                        <button class="btn btn-primary btn-lg w-full" type="submit">Entrar</button>
-                    </div>
-                </form>
+                            <div class="form-control">
+                                <label class="label" for="username">
+                                    <span class="label-text text-base font-semibold">Usuario</span>
+                                </label>
+                                <input id="username" name="username" type="text" required class="input input-bordered input-lg w-full">
+                            </div>
 
-                <div class="card mt-8 border border-primary/20 bg-primary/5">
-                    <div class="card-body py-5">
-                        <h3 class="card-title text-lg">Usuario de prueba</h3>
-                        <div class="font-mono text-sm">
-                            usuario: marcos<br>
-                            contraseña: marcos1234
+                            <div class="form-control">
+                                <label class="label" for="password">
+                                    <span class="label-text text-base font-semibold">Contraseña</span>
+                                </label>
+                                <input id="password" name="password" type="password" required class="input input-bordered input-lg w-full">
+                            </div>
+
+                            <div class="mt-8">
+                                <button class="btn btn-primary btn-lg w-full" type="submit">Entrar</button>
+                            </div>
+                        </form>
+
+                        <div class="card mt-8 border border-primary/20 bg-primary/5">
+                            <div class="card-body py-5">
+                                <h3 class="card-title text-lg">Usuario de prueba</h3>
+                                <div class="font-mono text-sm">
+                                    usuario: marcos<br>
+                                    contraseña: marcos1234
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col items-start gap-3">
+                            <a class="link link-primary text-base font-semibold" th:href="@{/register}">Crear una cuenta nueva</a>
+                            <a class="link link-hover text-base font-semibold" th:href="@{/}">← Volver a la página principal</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-8 flex flex-col items-start gap-3">
-                    <a class="link link-primary text-base font-semibold" th:href="@{/register}">Crear una cuenta nueva</a>
-                    <a class="link link-hover text-base font-semibold" th:href="@{/}">← Volver a la página principal</a>
-                </div>
             </div>
-        </div>
-    </div>
-</main>
+        </main>
 
-<div th:replace="~{fragments/footer :: siteFooter}"></div>
+        <div th:replace="~{fragments/footer :: siteFooter}"></div>
+    </div>
+
+    <div class="drawer-side z-50">
+        <label for="main-drawer" aria-label="Cerrar menú" class="drawer-overlay"></label>
+        <div th:replace="~{fragments/sidebar :: siteSidebar}"></div>
+    </div>
+</div>
 </body>
 </html>

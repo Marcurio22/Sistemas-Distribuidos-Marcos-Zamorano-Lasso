@@ -1,47 +1,71 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Práctica obligatoria 2</title>
   <link rel="stylesheet" th:href="@{/css/tailwind.css}">
-  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<div class="page-shell">
-  <div class="container-card">
-    <h1>Dashboard</h1>
-    <p class="subtitle">Sesión iniciada correctamente. Aquí puedes verificar la información del usuario autenticado.</p>
+<body class="page-shell">
+<div class="drawer">
+  <input id="main-drawer" type="checkbox" class="drawer-toggle">
 
-    <div class="card">
-      <p><span class="label">Usuario:</span> <span th:text="${user.username}">usuario</span></p>
-      <p><span class="label">Email:</span> <span th:text="${user.email}">email</span></p>
-      <p><span class="label">Rol:</span> <span th:text="${user.role}">USER</span></p>
-      <p><span class="label">Habilitado:</span> <span th:text="${user.enabled}">true</span></p>
-      <p>
-        <span class="label">Último login:</span>
-        <span th:text="${user.lastLoginAt != null ? #temporals.format(user.lastLoginAt, 'dd/MM/yyyy HH:mm:ss') : 'Sin registrar'}">
-                    fecha
-                </span>
-      </p>
-      <p><span class="label">Token de sesión UUID:</span></p>
-      <div class="token-box" th:text="${user.sessionToken}">token</div>
-    </div>
+  <div class="drawer-content flex min-h-screen flex-col">
+    <label for="main-drawer" class="menu-fab" aria-label="Abrir menú">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </label>
 
-    <div class="actions">
-      <a class="link-button" th:href="@{/lab}">Ir al laboratorio</a>
-      <a class="link-button secondary" th:href="@{/}">Ir a inicio</a>
+    <main class="page-main">
+      <div class="page-container">
+        <div class="page-card">
+          <div class="page-card-body gap-6">
+            <div>
+              <h1 class="section-title text-3xl md:text-5xl">Dashboard</h1>
+              <p class="section-subtitle">
+                Sesión iniciada correctamente. Aquí puedes verificar la información del usuario autenticado.
+              </p>
+            </div>
 
-      <form method="post" th:action="@{/logout}">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <button class="link-button" style="background:#dc2626;" type="submit">Cerrar sesión</button>
-      </form>
-    </div>
+            <div class="card border border-base-300 bg-base-100">
+              <div class="card-body space-y-3">
+                <p><span class="font-semibold">Usuario:</span> <span th:text="${user.username}">usuario</span></p>
+                <p><span class="font-semibold">Email:</span> <span th:text="${user.email}">email</span></p>
+                <p><span class="font-semibold">Rol:</span> <span th:text="${user.role}">USER</span></p>
+                <p><span class="font-semibold">Habilitado:</span> <span th:text="${user.enabled}">true</span></p>
+                <p>
+                  <span class="font-semibold">Último login:</span>
+                  <span th:text="${user.lastLoginAt != null ? #temporals.format(user.lastLoginAt, 'dd/MM/yyyy HH:mm:ss') : 'Sin registrar'}">
+                                        fecha
+                                    </span>
+                </p>
+                <div>
+                  <p class="font-semibold">Token de sesión UUID:</p>
+                  <div class="mockup-code mt-2">
+                    <pre><code th:text="${user.sessionToken}">token</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    <p class="footer-note">
-      Esta pantalla demuestra que la sesión está activa y que el token UUID se guarda correctamente tras el login.
-    </p>
+            <div class="alert alert-info">
+                            <span>
+                                Esta pantalla demuestra que la sesión está activa y que el token UUID se guarda correctamente tras el login.
+                            </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: siteFooter}"></div>
+  </div>
+
+  <div class="drawer-side z-50">
+    <label for="main-drawer" aria-label="Cerrar menú" class="drawer-overlay"></label>
+    <div th:replace="~{fragments/sidebar :: siteSidebar}"></div>
   </div>
 </div>
-<div th:replace="~{fragments/footer :: siteFooter}"></div>
 </body>
 </html>

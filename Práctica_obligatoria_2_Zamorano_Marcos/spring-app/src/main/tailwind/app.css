@@ -16,7 +16,7 @@
   }
 
   .page-container {
-    @apply mx-auto w-full max-w-7xl px-4 py-8 md:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl px-4 py-8 pt-24 md:px-6 lg:px-8;
   }
 
   .page-card {
@@ -45,5 +45,33 @@
 
   .field-error {
     @apply mt-2 text-sm font-semibold text-error;
+  }
+
+  .layout-shell {
+    @apply mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 pt-24 md:px-6 lg:px-8;
+  }
+
+  .content-panel {
+    @apply min-w-0;
+  }
+
+  .menu-fab {
+    @apply btn btn-primary btn-square btn-lg fixed left-4 top-4 z-40 rounded-2xl shadow-2xl;
+  }
+
+  .sidebar-surface {
+    @apply min-h-full w-80 bg-gradient-to-b from-primary to-secondary text-primary-content shadow-2xl flex flex-col;
+  }
+
+  .sidebar-nav-link {
+    @apply flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold text-primary-content/90 transition hover:bg-primary-content/10 hover:text-primary-content;
+  }
+
+  .sidebar-nav-link-active {
+    @apply bg-primary-content/15 text-primary-content;
+  }
+
+  .sidebar-section-title {
+    @apply px-4 pb-2 pt-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-content/60;
   }
 }

@@ -1,129 +1,173 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratorio de excepciones</title>
     <link rel="stylesheet" th:href="@{/css/tailwind.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<div class="page-shell">
-    <div class="container-card">
-        <h1>Laboratorio de excepciones</h1>
-        <p class="subtitle">
-            Esta pantalla invoca el servicio Flask desde Spring Boot y muestra cómo se capturan,
-            traducen y presentan los errores al usuario.
-        </p>
+<body class="page-shell">
+<div class="drawer">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle">
 
-        <div class="top-links">
-            <a class="link-text" th:href="@{/dashboard}">Ver dashboard</a>
-            <a class="link-text" th:href="@{/}">Ir a inicio</a>
-        </div>
+    <div class="drawer-content flex min-h-screen flex-col">
+        <label for="main-drawer" class="menu-fab" aria-label="Abrir menú">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </label>
 
-        <div class="grid-4">
-            <div class="card">
-                <h3 class="section-title">Ficheros</h3>
-                <p class="muted">Pruebas de lectura correcta, fichero inexistente y acceso prohibido.</p>
-                <div class="button-list">
-                    <form method="get" th:action="@{/lab/files/read}">
-                        <input type="hidden" name="filename" value="demo_ok.txt">
-                        <button type="submit">Leer demo_ok.txt</button>
-                    </form>
-                    <form method="get" th:action="@{/lab/files/read}">
-                        <input type="hidden" name="filename" value="no_existe.txt">
-                        <button type="submit">Leer fichero inexistente</button>
-                    </form>
-                    <form method="get" th:action="@{/lab/files/read}">
-                        <input type="hidden" name="filename" value="confidential.txt">
-                        <button type="submit">Leer fichero prohibido</button>
-                    </form>
+        <main class="page-main">
+            <div class="page-container">
+                <div class="page-card">
+                    <div class="page-card-body gap-8">
+                        <div>
+                            <h1 class="section-title text-3xl md:text-5xl">Laboratorio de excepciones</h1>
+                            <p class="section-subtitle">
+                                Esta pantalla invoca el servicio Flask desde Spring Boot y muestra cómo se capturan,
+                                traducen y presentan los errores al usuario.
+                            </p>
+                        </div>
+
+                        <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-4">
+                            <div class="card border border-base-300 bg-base-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Ficheros</h3>
+                                    <p class="text-sm text-base-content/70">
+                                        Pruebas de lectura correcta, fichero inexistente y acceso prohibido.
+                                    </p>
+                                    <div class="mt-3 flex flex-col gap-2">
+                                        <form method="get" th:action="@{/lab/files/read}">
+                                            <input type="hidden" name="filename" value="demo_ok.txt">
+                                            <button class="btn btn-primary btn-sm w-full" type="submit">Leer demo_ok.txt</button>
+                                        </form>
+                                        <form method="get" th:action="@{/lab/files/read}">
+                                            <input type="hidden" name="filename" value="no_existe.txt">
+                                            <button class="btn btn-primary btn-sm w-full" type="submit">Leer fichero inexistente</button>
+                                        </form>
+                                        <form method="get" th:action="@{/lab/files/read}">
+                                            <input type="hidden" name="filename" value="confidential.txt">
+                                            <button class="btn btn-primary btn-sm w-full" type="submit">Leer fichero prohibido</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card border border-base-300 bg-base-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Base de datos</h3>
+                                    <p class="text-sm text-base-content/70">
+                                        Pruebas de consulta correcta y error SQL forzado.
+                                    </p>
+                                    <div class="mt-3 flex flex-col gap-2">
+                                        <form method="get" th:action="@{/lab/database/users}">
+                                            <button class="btn btn-secondary btn-sm w-full" type="submit">Consultar usuarios</button>
+                                        </form>
+                                        <form method="get" th:action="@{/lab/database/force-error}">
+                                            <button class="btn btn-secondary btn-sm w-full" type="submit">Forzar error SQL</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card border border-base-300 bg-base-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">API Pokémon</h3>
+                                    <p class="text-sm text-base-content/70">
+                                        Pruebas contra servicio externo correcto y recurso inexistente.
+                                    </p>
+                                    <div class="mt-3 flex flex-col gap-2">
+                                        <form method="get" th:action="@{/lab/pokemon}">
+                                            <input type="hidden" name="name" value="pikachu">
+                                            <button class="btn btn-accent btn-sm w-full" type="submit">Consultar Pikachu</button>
+                                        </form>
+                                        <form method="get" th:action="@{/lab/pokemon}">
+                                            <input type="hidden" name="name" value="pokemoninventadoxyz">
+                                            <button class="btn btn-accent btn-sm w-full" type="submit">Consultar Pokémon inexistente</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card border border-base-300 bg-base-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Red / timeout</h3>
+                                    <p class="text-sm text-base-content/70">
+                                        Flask espera 10 s, pero Spring solo espera 5 s.
+                                    </p>
+                                    <div class="mt-3 flex flex-col gap-2">
+                                        <form method="get" th:action="@{/lab/network/timeout}">
+                                            <input type="hidden" name="seconds" value="10">
+                                            <button class="btn btn-warning btn-sm w-full" type="submit">Provocar timeout</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${result != null}"
+                             class="rounded-2xl border p-6"
+                             th:classappend="${result.success} ? ' border-success bg-success/10' : ' border-error bg-error/10'">
+
+                            <h2 class="text-2xl font-bold"
+                                th:text="${result.success} ? 'Resultado correcto' : 'Resultado con error'">
+                                Resultado
+                            </h2>
+
+                            <div class="mt-4 space-y-2">
+                                <p><span class="font-semibold">Operación:</span> <span th:text="${result.operationLabel}">Operación</span></p>
+                                <p><span class="font-semibold">Mensaje para usuario:</span> <span th:text="${result.userMessage}">Mensaje</span></p>
+                                <p><span class="font-semibold">Detalle técnico:</span> <span th:text="${result.technicalMessage}">Detalle técnico</span></p>
+                            </div>
+
+                            <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                                <div class="rounded-xl bg-base-100 p-3 shadow-sm">
+                                    <span class="font-semibold">Categoría:</span>
+                                    <div th:text="${result.category}">CATEGORY</div>
+                                </div>
+                                <div class="rounded-xl bg-base-100 p-3 shadow-sm">
+                                    <span class="font-semibold">Código:</span>
+                                    <div th:text="${result.errorCode}">CODE</div>
+                                </div>
+                                <div class="rounded-xl bg-base-100 p-3 shadow-sm">
+                                    <span class="font-semibold">HTTP status:</span>
+                                    <div th:text="${result.httpStatus}">200</div>
+                                </div>
+                                <div class="rounded-xl bg-base-100 p-3 shadow-sm">
+                                    <span class="font-semibold">Crítico:</span>
+                                    <div th:text="${result.critical}">false</div>
+                                </div>
+                                <div class="rounded-xl bg-base-100 p-3 shadow-sm">
+                                    <span class="font-semibold">Timestamp:</span>
+                                    <div th:text="${result.timestamp}">timestamp</div>
+                                </div>
+                            </div>
+
+                            <div th:if="${result.rawDataJson != null}" class="mt-6">
+                                <h3 class="text-lg font-bold">Datos devueltos por Flask</h3>
+                                <div class="mockup-code mt-3">
+                                    <pre><code th:text="${result.rawDataJson}">json</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <span>
+                                Desde esta vista se demuestra la integración Spring ↔ Flask y la traducción de errores técnicos a mensajes entendibles.
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </main>
 
-            <div class="card">
-                <h3 class="section-title">Base de datos</h3>
-                <p class="muted">Pruebas de consulta correcta y error SQL forzado.</p>
-                <div class="button-list">
-                    <form method="get" th:action="@{/lab/database/users}">
-                        <button type="submit">Consultar usuarios</button>
-                    </form>
-                    <form method="get" th:action="@{/lab/database/force-error}">
-                        <button type="submit">Forzar error SQL</button>
-                    </form>
-                </div>
-            </div>
+        <div th:replace="~{fragments/footer :: siteFooter}"></div>
+    </div>
 
-            <div class="card">
-                <h3 class="section-title">API Pokémon</h3>
-                <p class="muted">Pruebas contra servicio externo correcto y recurso inexistente.</p>
-                <div class="button-list">
-                    <form method="get" th:action="@{/lab/pokemon}">
-                        <input type="hidden" name="name" value="pikachu">
-                        <button type="submit">Consultar Pikachu</button>
-                    </form>
-                    <form method="get" th:action="@{/lab/pokemon}">
-                        <input type="hidden" name="name" value="pokemoninventadoxyz">
-                        <button type="submit">Consultar Pokémon inexistente</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 class="section-title">Red / timeout</h3>
-                <p class="muted">Flask espera 10 s, pero Spring solo espera 5 s.</p>
-                <div class="button-list">
-                    <form method="get" th:action="@{/lab/network/timeout}">
-                        <input type="hidden" name="seconds" value="10">
-                        <button type="submit">Provocar timeout</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div th:if="${result != null}"
-             class="result-box"
-             th:classappend="${result.success} ? ' success' : ' error'">
-
-            <h2 th:text="${result.success} ? 'Resultado correcto' : 'Resultado con error'">Resultado</h2>
-
-            <p><span class="label">Operación:</span> <span th:text="${result.operationLabel}">Operación</span></p>
-            <p><span class="label">Mensaje para usuario:</span> <span th:text="${result.userMessage}">Mensaje</span></p>
-            <p><span class="label">Detalle técnico:</span> <span th:text="${result.technicalMessage}">Detalle técnico</span></p>
-
-            <div class="meta-grid">
-                <div class="meta-item">
-                    <span class="label">Categoría:</span>
-                    <span th:text="${result.category}">CATEGORY</span>
-                </div>
-                <div class="meta-item">
-                    <span class="label">Código:</span>
-                    <span th:text="${result.errorCode}">CODE</span>
-                </div>
-                <div class="meta-item">
-                    <span class="label">HTTP status:</span>
-                    <span th:text="${result.httpStatus}">200</span>
-                </div>
-                <div class="meta-item">
-                    <span class="label">Crítico:</span>
-                    <span th:text="${result.critical}">false</span>
-                </div>
-                <div class="meta-item">
-                    <span class="label">Timestamp:</span>
-                    <span th:text="${result.timestamp}">timestamp</span>
-                </div>
-            </div>
-
-            <div th:if="${result.rawDataJson != null}">
-                <h3>Datos devueltos por Flask</h3>
-                <pre class="code-block" th:text="${result.rawDataJson}">json</pre>
-            </div>
-        </div>
-
-        <p class="footer-note">
-            Desde esta vista se demuestra la integración Spring ↔ Flask y la traducción de errores técnicos a mensajes entendibles.
-        </p>
+    <div class="drawer-side z-50">
+        <label for="main-drawer" aria-label="Cerrar menú" class="drawer-overlay"></label>
+        <div th:replace="~{fragments/sidebar :: siteSidebar}"></div>
     </div>
 </div>
-<div th:replace="~{fragments/footer :: siteFooter}"></div>
 </body>
 </html>
