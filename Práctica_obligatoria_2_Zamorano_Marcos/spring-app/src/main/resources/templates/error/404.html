@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Página no encontrada</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="error-page">
+    <div class="container-card">
+        <div class="error-code">404</div>
+        <h1>Página no encontrada</h1>
+        <p class="subtitle">La ruta solicitada no existe o ya no está disponible.</p>
+        <div class="hero-actions">
+            <a class="link-button" th:href="@{/}">Volver al inicio</a>
+            <a class="link-button secondary" th:href="@{/lab}">Ir al laboratorio</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

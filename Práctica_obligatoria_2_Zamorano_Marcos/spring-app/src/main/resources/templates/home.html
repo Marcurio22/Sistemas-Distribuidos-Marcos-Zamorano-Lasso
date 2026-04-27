@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Práctica obligatoria 2</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="page-shell">
+    <div class="container-card">
+        <section class="hero">
+            <h1 th:text="${appName}">Práctica obligatoria 2</h1>
+            <p class="subtitle" th:text="${subtitle}">
+                Sistema distribuido con Spring Boot, Flask y MySQL
+            </p>
+            <p>
+                Esta aplicación demuestra cómo se capturan, propagan y traducen excepciones en un sistema distribuido
+                con frontend en Spring Boot, API externa en Flask, acceso a base de datos y llamadas a servicios de terceros.
+            </p>
+
+            <div class="hero-actions">
+                <a class="link-button" th:href="@{/login}">Iniciar sesión</a>
+                <a class="link-button secondary" th:href="@{/lab}">Ir al laboratorio</a>
+            </div>
+
+            <div class="badge-row">
+                <span class="badge">Spring Boot</span>
+                <span class="badge">Thymeleaf</span>
+                <span class="badge">Flask</span>
+                <span class="badge">MySQL</span>
+                <span class="badge">Excepciones distribuidas</span>
+            </div>
+        </section>
+
+        <section class="grid-3">
+            <div class="card">
+                <h3>Frontend Spring Boot</h3>
+                <p>Página principal, login, dashboard y laboratorio web con traducción de errores al usuario.</p>
+            </div>
+
+            <div class="card">
+                <h3>API Flask</h3>
+                <p>Laboratorio técnico con endpoints de ficheros, base de datos, API externa y timeout.</p>
+            </div>
+
+            <div class="card">
+                <h3>Base de datos MySQL</h3>
+                <p>Persistencia de usuarios, sesión y soporte para pruebas de acceso a datos.</p>
+            </div>
+        </section>
+
+        <div class="info-panel">
+            <strong>Estado esperado del sistema:</strong>
+            <ul>
+                <li>Frontend accesible desde Spring Boot.</li>
+                <li>API Flask operativa y accesible por HTTP.</li>
+                <li>Gestión de login, sesión y token UUID.</li>
+                <li>Pruebas de errores disponibles desde navegador y Postman.</li>
+            </ul>
+        </div>
+
+        <p class="footer-note">
+            Proyecto académico de sistemas distribuidos. En la memoria final se documentará la arquitectura,
+            los casos de prueba y el tratamiento de excepciones.
+        </p>
+    </div>
+</div>
+</body>
+</html>

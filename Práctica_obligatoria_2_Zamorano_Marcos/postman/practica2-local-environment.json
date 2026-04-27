@@ -1,0 +1,261 @@
+{
+  "info": {
+    "_postman_id": "c646fe54-8683-4afa-a5c1-6f2fc37f6c33",
+    "name": "Práctica Obligatoria 2 - Sistemas Distribuidos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54324505",
+    "_collection_link": "https://go.postman.co/collection/54324505-c646fe54-8683-4afa-a5c1-6f2fc37f6c33?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Flask",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/health",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Files",
+      "item": [
+        {
+          "name": "Read demo_ok.txt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/files/read/demo_ok.txt",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "files",
+                "read",
+                "demo_ok.txt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read no_existe.txt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/files/read/no_existe.txt",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "files",
+                "read",
+                "no_existe.txt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "read confidential.txt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/files/read/confidential.txt",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "files",
+                "read",
+                "confidential.txt"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Database",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/database/users",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "database",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Force database error",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/database/force-error",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "database",
+                "force-error"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pokemon",
+      "item": [
+        {
+          "name": "Get Pikachu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/pokemon/pikachu",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "pokemon",
+                "pikachu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get invalid pokemon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/pokemon/pokemoninventadoxyz",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "pokemon",
+                "pokemoninventadoxyz"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Network",
+      "item": [
+        {
+          "name": "Timeout 10 seconds",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{flaskBaseUrl}}/api/lab/network/timeout?seconds=10",
+              "host": [
+                "{{flaskBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lab",
+                "network",
+                "timeout"
+              ],
+              "query": [
+                {
+                  "key": "seconds",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Spring Front",
+      "item": [
+        {
+          "name": "Spring home",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{springBaseUrl}}/",
+              "host": [
+                "{{springBaseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Spring login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{springBaseUrl}}/login",
+              "host": [
+                "{{springBaseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

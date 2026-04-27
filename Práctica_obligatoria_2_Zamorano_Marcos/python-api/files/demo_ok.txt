@@ -1,0 +1,2 @@
+Este es un fichero de prueba correcto.
+La lectura de este recurso debe funcionar sin errores.

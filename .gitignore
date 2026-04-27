@@ -1,0 +1,27 @@
+# Python
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Java / Maven / Spring
+**/target/
+**/build/
+
+# IntelliJ IDEA
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/shelf/
+**/*.iws
+**/.idea/
+**/*.iml
+
+# Variables de entorno
+.env
+**/.env
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
