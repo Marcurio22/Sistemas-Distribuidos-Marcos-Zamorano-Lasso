@@ -349,3 +349,14 @@ button {
         padding: 22px;
     }
 }
+
+.field-error {
+    color: #b91c1c;
+    font-size: 13px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+.form-panel ul {
+    padding-left: 18px;
+}
