@@ -360,3 +360,19 @@ button {
 .form-panel ul {
     padding-left: 18px;
 }
+
+.field-error {
+    color: #b91c1c;
+    font-size: 13px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.form-panel ul {
+    padding-left: 18px;
+}
+
+.alert.error {
+    border: 1px solid #fecaca;
+}
