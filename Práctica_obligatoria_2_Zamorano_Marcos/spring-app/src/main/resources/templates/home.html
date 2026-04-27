@@ -1,70 +1,83 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Práctica obligatoria 2</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
 </head>
-<body>
-<div class="page-shell">
-    <div class="container-card">
-        <section class="hero">
-            <h1 th:text="${appName}">Práctica obligatoria 2</h1>
-            <p class="subtitle" th:text="${subtitle}">
-                Sistema distribuido con Spring Boot, Flask y MySQL
-            </p>
-            <p>
-                Esta aplicación demuestra cómo se capturan, propagan y traducen excepciones en un sistema distribuido
-                con frontend en Spring Boot, API externa en Flask, acceso a base de datos y llamadas a servicios de terceros.
-            </p>
+<body class="page-shell">
+<main class="page-main">
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-card-body gap-8">
+                <section class="space-y-5">
+                    <div class="space-y-3">
+                        <h1 class="section-title" th:text="${appName}">Práctica obligatoria 2</h1>
+                        <p class="section-subtitle" th:text="${subtitle}">
+                            Sistema distribuido con Spring Boot, Flask y MySQL
+                        </p>
+                        <p class="max-w-4xl text-base leading-7 text-base-content/80">
+                            Esta aplicación demuestra cómo se capturan, propagan y traducen excepciones
+                            en un sistema distribuido con frontend en Spring Boot, API externa en Flask,
+                            acceso a base de datos y llamadas a servicios de terceros.
+                        </p>
+                    </div>
 
-            <div class="hero-actions">
-                <a class="link-button" th:href="@{/login}">Iniciar sesión</a>
-                <a class="link-button secondary" th:href="@{/register}">Crear cuenta</a>
-                <a class="link-button secondary" th:href="@{/lab}">Ir al laboratorio</a>
+                    <div class="flex flex-wrap gap-3">
+                        <a class="btn btn-primary" th:href="@{/login}">Iniciar sesión</a>
+                        <a class="btn btn-outline btn-primary" th:href="@{/register}">Crear cuenta</a>
+                        <a class="btn btn-outline" th:href="@{/lab}">Ir al laboratorio</a>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="badge badge-primary badge-outline badge-lg">Spring Boot</span>
+                        <span class="badge badge-secondary badge-outline badge-lg">Thymeleaf</span>
+                        <span class="badge badge-accent badge-outline badge-lg">Flask</span>
+                        <span class="badge badge-info badge-outline badge-lg">MySQL</span>
+                        <span class="badge badge-success badge-outline badge-lg">Excepciones distribuidas</span>
+                    </div>
+                </section>
+
+                <section class="grid gap-4 md:grid-cols-3">
+                    <div class="card border border-base-300 bg-base-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Frontend Spring Boot</h3>
+                            <p>Página principal, login, registro, dashboard y laboratorio web con traducción de errores.</p>
+                        </div>
+                    </div>
+
+                    <div class="card border border-base-300 bg-base-100">
+                        <div class="card-body">
+                            <h3 class="card-title">API Flask</h3>
+                            <p>Servicio técnico con endpoints de ficheros, base de datos, Pokémon API y timeout.</p>
+                        </div>
+                    </div>
+
+                    <div class="card border border-base-300 bg-base-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Base de datos MySQL</h3>
+                            <p>Persistencia de usuarios, token de sesión y soporte para las pruebas de acceso a datos.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="alert alert-info">
+                    <div>
+                        <span class="font-semibold">Estado esperado del sistema:</span>
+                        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm">
+                            <li>Frontend accesible desde Spring Boot.</li>
+                            <li>API Flask operativa y accesible por HTTP.</li>
+                            <li>Gestión de login, registro, sesión y token UUID.</li>
+                            <li>Pruebas de errores disponibles desde navegador y Postman.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-
-            <div class="badge-row">
-                <span class="badge">Spring Boot</span>
-                <span class="badge">Thymeleaf</span>
-                <span class="badge">Flask</span>
-                <span class="badge">MySQL</span>
-                <span class="badge">Excepciones distribuidas</span>
-            </div>
-        </section>
-
-        <section class="grid-3">
-            <div class="card">
-                <h3>Frontend Spring Boot</h3>
-                <p>Página principal, login, dashboard y laboratorio web con traducción de errores al usuario.</p>
-            </div>
-
-            <div class="card">
-                <h3>API Flask</h3>
-                <p>Laboratorio técnico con endpoints de ficheros, base de datos, API externa y timeout.</p>
-            </div>
-
-            <div class="card">
-                <h3>Base de datos MySQL</h3>
-                <p>Persistencia de usuarios, sesión y soporte para pruebas de acceso a datos.</p>
-            </div>
-        </section>
-
-        <div class="info-panel">
-            <strong>Estado esperado del sistema:</strong>
-            <ul>
-                <li>Frontend accesible desde Spring Boot.</li>
-                <li>API Flask operativa y accesible por HTTP.</li>
-                <li>Gestión de login, sesión y token UUID.</li>
-                <li>Pruebas de errores disponibles desde navegador y Postman.</li>
-            </ul>
         </div>
-
-        <p class="footer-note">
-            Proyecto académico de sistemas distribuidos. En la memoria final se documentará la arquitectura,
-            los casos de prueba y el tratamiento de excepciones.
-        </p>
     </div>
-</div>
+</main>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 </body>
 </html>

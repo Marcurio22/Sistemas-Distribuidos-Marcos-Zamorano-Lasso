@@ -1,0 +1,49 @@
+@import "tailwindcss" source(none);
+@source "../resources/templates";
+@source "../resources/static/js";
+@plugin "daisyui" {
+  themes: light --default;
+}
+
+/* Ajustes finos propios */
+@layer components {
+  .page-shell {
+    @apply min-h-screen bg-base-200 text-base-content flex flex-col;
+  }
+
+  .page-main {
+    @apply flex-1;
+  }
+
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 py-8 md:px-6 lg:px-8;
+  }
+
+  .page-card {
+    @apply card bg-base-100 shadow-xl border border-base-300;
+  }
+
+  .page-card-body {
+    @apply card-body;
+  }
+
+  .section-title {
+    @apply text-4xl font-extrabold tracking-tight text-primary;
+  }
+
+  .section-subtitle {
+    @apply mt-3 text-base md:text-lg text-base-content/70;
+  }
+
+  .footer-shell {
+    @apply border-t border-base-300 bg-base-100/95 backdrop-blur;
+  }
+
+  .footer-inner {
+    @apply mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8;
+  }
+
+  .field-error {
+    @apply mt-2 text-sm font-semibold text-error;
+  }
+}

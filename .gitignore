@@ -6,6 +6,10 @@
 **/*.pyo
 **/*.pyd
 
+# Node / Tailwind / daisyUI
+spring-app/node_modules/
+spring-app/.npm/
+
 # Java / Maven / Spring
 **/target/
 **/build/

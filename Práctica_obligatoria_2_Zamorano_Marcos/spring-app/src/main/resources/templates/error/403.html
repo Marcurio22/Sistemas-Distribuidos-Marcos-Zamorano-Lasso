@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>403 - Acceso denegado</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
 </head>
 <body>
 <div class="error-page">
@@ -17,5 +17,6 @@
         </div>
     </div>
 </div>
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 </body>
 </html>
