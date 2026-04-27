@@ -24,7 +24,7 @@ public class AuthController {
     @GetMapping("/login")
     public String login(Authentication authentication) {
         if (isAuthenticated(authentication)) {
-            return "redirect:/lab";
+            return "redirect:/dashboard";
         }
         return "login";
     }
@@ -32,7 +32,7 @@ public class AuthController {
     @GetMapping("/register")
     public String registerForm(Authentication authentication, Model model) {
         if (isAuthenticated(authentication)) {
-            return "redirect:/lab";
+            return "redirect:/dashboard";
         }
 
         if (!model.containsAttribute("registerForm")) {
@@ -47,7 +47,7 @@ public class AuthController {
                            Authentication authentication,
                            Model model) {
         if (isAuthenticated(authentication)) {
-            return "redirect:/lab";
+            return "redirect:/dashboard";
         }
 
         try {

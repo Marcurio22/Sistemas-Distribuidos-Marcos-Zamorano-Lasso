@@ -34,10 +34,21 @@
                                 </p>
                             </div>
 
-                            <div class="flex flex-wrap gap-3">
-                                <a class="btn btn-primary" th:href="@{/login}">Iniciar sesión</a>
-                                <a class="btn btn-outline btn-primary" th:href="@{/register}">Crear cuenta</a>
-                                <a class="btn btn-outline" th:href="@{/lab}">Ir al laboratorio</a>
+                            <div class="space-y-3">
+                                <div th:if="${authenticated}" class="text-sm font-medium text-base-content/70">
+                                    Sesión iniciada como <span class="font-bold text-primary" th:text="${currentUsername}">usuario</span>
+                                </div>
+
+                                <div class="flex flex-wrap gap-3" th:unless="${authenticated}">
+                                    <a class="btn btn-primary" th:href="@{/login}">Iniciar sesión</a>
+                                    <a class="btn btn-outline btn-primary" th:href="@{/register}">Crear cuenta</a>
+                                    <a class="btn btn-outline" th:href="@{/lab}">Ir al laboratorio</a>
+                                </div>
+
+                                <div class="flex flex-wrap gap-3" th:if="${authenticated}">
+                                    <a class="btn btn-primary" th:href="@{/dashboard}">Ir al dashboard</a>
+                                    <a class="btn btn-outline" th:href="@{/lab}">Ir al laboratorio</a>
+                                </div>
                             </div>
 
                             <div class="flex flex-wrap gap-2">
