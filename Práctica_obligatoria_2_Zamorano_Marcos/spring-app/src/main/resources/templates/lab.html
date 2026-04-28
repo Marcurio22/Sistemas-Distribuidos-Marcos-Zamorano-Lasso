@@ -6,6 +6,158 @@
     <title>Laboratorio de excepciones</title>
     <link rel="stylesheet" th:href="@{/css/tailwind.css}">
 </head>
+
+<script th:inline="javascript">
+    const labHasResult = [[${result != null}]];
+    const labSuccess = [[${result != null ? result.success : false}]];
+    const labOperation = [[${result != null ? result.operationLabel : ''}]];
+    const labRawJson = [[${result != null ? result.rawDataJson : null}]];
+
+    function capitalize(value) {
+        if (!value) return "";
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function statLabel(name) {
+        switch (name) {
+            case "hp": return "HP";
+            case "attack": return "Ataque";
+            case "defense": return "Defensa";
+            case "special-attack": return "Ataque especial";
+            case "special-defense": return "Defensa especial";
+            case "speed": return "Velocidad";
+            default: return capitalize(name);
+        }
+    }
+
+    function typeBadgeClass(type) {
+        const map = {
+            fire: "badge-error",
+            water: "badge-info",
+            grass: "badge-success",
+            electric: "badge-warning",
+            psychic: "badge-secondary",
+            ice: "badge-accent",
+            dark: "badge-neutral",
+            dragon: "badge-primary",
+            fairy: "badge-secondary",
+            fighting: "badge-error",
+            poison: "badge-secondary",
+            ground: "badge-warning",
+            flying: "badge-info",
+            rock: "badge-neutral",
+            bug: "badge-success",
+            ghost: "badge-secondary",
+            steel: "badge-neutral"
+        };
+        return map[type] || "badge-outline";
+    }
+
+    function renderPokemonEpicCard(pokemon) {
+        const panel = document.getElementById("pokemon-epic-panel");
+        if (!panel) return;
+
+        const artwork =
+            pokemon?.sprites?.official_artwork ||
+            pokemon?.sprites?.front_default ||
+            "";
+
+        const typesHtml = (pokemon.types || []).map(type => `
+            <span class="badge ${typeBadgeClass(type)} badge-lg">${type}</span>
+        `).join("");
+
+        const abilitiesHtml = (pokemon.abilities || []).map(ability => `
+            <span class="badge badge-outline badge-lg">${ability}</span>
+        `).join("");
+
+        const statsHtml = (pokemon.stats || []).map(stat => {
+            const percent = Math.max(0, Math.min(100, Math.round((stat.value / 150) * 100)));
+            return `
+                <div class="rounded-2xl border border-base-300 bg-base-100/70 p-4">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="font-semibold">${statLabel(stat.name)}</span>
+                        <span class="font-bold text-accent">${stat.value}</span>
+                    </div>
+                    <progress class="progress progress-accent w-full" value="${percent}" max="100"></progress>
+                </div>
+            `;
+        }).join("");
+
+        const displayName = capitalize(pokemon.name || "pokemon");
+        const height = pokemon.height != null ? `${pokemon.height / 10} m` : "-";
+        const weight = pokemon.weight != null ? `${pokemon.weight / 10} kg` : "-";
+        const baseExperience = pokemon.base_experience != null ? pokemon.base_experience : "-";
+
+        panel.innerHTML = `
+            <div class="overflow-hidden rounded-[2rem] border border-accent/20 bg-gradient-to-br from-slate-950 via-indigo-950 to-cyan-950 text-white shadow-2xl">
+                <div class="border-b border-white/10 p-6 md:p-8">
+                    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300">
+                        Registro Pokédex
+                    </p>
+                    <div class="mt-3 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h3 class="text-4xl font-extrabold tracking-tight md:text-5xl">${displayName}</h3>
+                            <p class="mt-2 text-sm text-slate-300">Pokédex #${pokemon.id ?? "-"}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">${typesHtml}</div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 p-6 md:grid-cols-[320px_minmax(0,1fr)] md:p-8">
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        ${
+                            artwork
+                                ? `<img src="${artwork}" alt="${displayName}" class="mx-auto h-64 w-64 object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.35)]">`
+                                : `<div class="flex h-64 items-center justify-center rounded-2xl border border-dashed border-white/20 text-slate-300">Sin imagen disponible</div>`
+                        }
+
+                        <div class="mt-6 grid gap-3">
+                            <div class="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                                <span class="text-sm font-semibold uppercase tracking-wide text-slate-300">Altura</span>
+                                <span class="text-lg font-bold text-cyan-200">${height}</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                                <span class="text-sm font-semibold uppercase tracking-wide text-slate-300">Peso</span>
+                                <span class="text-lg font-bold text-cyan-200">${weight}</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                                <span class="text-sm font-semibold uppercase tracking-wide text-slate-300">Exp. base</span>
+                                <span class="text-lg font-bold text-cyan-200">${baseExperience}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        <div class="mb-6">
+                            <h4 class="mb-3 text-lg font-bold text-cyan-200">Habilidades</h4>
+                            <div class="flex flex-wrap gap-2">${abilitiesHtml}</div>
+                        </div>
+
+                        <div>
+                            <h4 class="mb-3 text-lg font-bold text-cyan-200">Estadísticas base</h4>
+                            <div class="space-y-4">${statsHtml}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        panel.classList.remove("hidden");
+    }
+
+    (function () {
+        if (!labHasResult || !labSuccess || !labOperation || !labRawJson) return;
+        if (!labOperation.toLowerCase().includes("pokémon")) return;
+
+        try {
+            const parsed = JSON.parse(labRawJson);
+            renderPokemonEpicCard(parsed);
+        } catch (error) {
+            console.error("No se pudo renderizar la ficha Pokémon:", error);
+        }
+    })();
+</script>
+
 <body class="page-shell">
 <div class="drawer">
     <input id="main-drawer" type="checkbox" class="drawer-toggle">
@@ -74,18 +226,34 @@
                                 <div class="card-body">
                                     <h3 class="card-title">API Pokémon</h3>
                                     <p class="text-sm text-base-content/70">
-                                        Pruebas contra servicio externo correcto y recurso inexistente.
+                                        Pruebas contra servicio externo correcto, recurso inexistente y búsqueda libre de Pokémon.
                                     </p>
+
                                     <div class="mt-3 flex flex-col gap-2">
                                         <form method="get" th:action="@{/lab/pokemon}">
                                             <input type="hidden" name="name" value="pikachu">
                                             <button class="btn btn-accent btn-sm w-full" type="submit">Consultar Pikachu</button>
                                         </form>
+
                                         <form method="get" th:action="@{/lab/pokemon}">
                                             <input type="hidden" name="name" value="pokemoninventadoxyz">
                                             <button class="btn btn-accent btn-sm w-full" type="submit">Consultar Pokémon inexistente</button>
                                         </form>
                                     </div>
+
+                                    <div class="divider my-3">Búsqueda libre</div>
+
+                                    <form method="get" th:action="@{/lab/pokemon}" class="flex flex-col gap-3">
+                                        <input
+                                                class="input input-bordered w-full"
+                                                type="text"
+                                                name="name"
+                                                placeholder="Ejemplo: charizard, mewtwo, bulbasaur..."
+                                                required>
+                                        <button class="btn btn-outline btn-accent w-full" type="submit">
+                                            Buscar Pokémon
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
@@ -143,11 +311,110 @@
                                 </div>
                             </div>
 
-                            <div th:if="${result.rawDataJson != null}" class="mt-6">
-                                <h3 class="text-lg font-bold">Datos devueltos por Flask</h3>
-                                <div class="mockup-code mt-3">
-                                    <pre><code th:text="${result.rawDataJson}">json</code></pre>
+                            <div id="pokemon-epic-panel" class="mt-8 hidden"></div>
+
+                            <div th:if="${result.pokemonDetails != null}" class="pokemon-battle-card mt-8">
+                                <div class="pokemon-battle-header">
+                                    <div>
+                                        <p class="pokemon-kicker">Registro Pokédex</p>
+                                        <h3 class="pokemon-name" th:text="${result.pokemonDetails.displayName}">Pikachu</h3>
+                                        <p class="pokemon-subtitle">
+                                            Pokédex #<span th:text="${result.pokemonDetails.id}">25</span>
+                                        </p>
+                                    </div>
+
+                                    <div class="pokemon-type-list">
+                                        <span th:each="type : ${result.pokemonDetails.types}"
+                                              class="pokemon-type-badge"
+                                              th:text="${type}">
+                                            electric
+                                        </span>
+                                    </div>
                                 </div>
+
+                                <div class="pokemon-battle-grid">
+                                    <div class="pokemon-art-panel">
+                                        <img th:if="${result.pokemonDetails.officialArtwork != null}"
+                                             th:src="${result.pokemonDetails.officialArtwork}"
+                                             th:alt="${result.pokemonDetails.displayName}"
+                                             class="pokemon-artwork">
+
+                                        <img th:if="${result.pokemonDetails.officialArtwork == null and result.pokemonDetails.frontDefault != null}"
+                                             th:src="${result.pokemonDetails.frontDefault}"
+                                             th:alt="${result.pokemonDetails.displayName}"
+                                             class="pokemon-artwork">
+
+                                        <div class="pokemon-core-stats">
+                                            <div class="pokemon-core-stat">
+                                                <span class="pokemon-core-label">Altura</span>
+                                                <span class="pokemon-core-value" th:text="${result.pokemonDetails.heightDisplay}">0.4 m</span>
+                                            </div>
+                                            <div class="pokemon-core-stat">
+                                                <span class="pokemon-core-label">Peso</span>
+                                                <span class="pokemon-core-value" th:text="${result.pokemonDetails.weightDisplay}">6.0 kg</span>
+                                            </div>
+                                            <div class="pokemon-core-stat">
+                                                <span class="pokemon-core-label">Exp. base</span>
+                                                <span class="pokemon-core-value" th:text="${result.pokemonDetails.baseExperience}">112</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pokemon-info-panel">
+                                        <div class="pokemon-section">
+                                            <h4>Habilidades</h4>
+                                            <div class="pokemon-chip-list">
+                                                <span th:each="ability : ${result.pokemonDetails.abilities}"
+                                                      class="pokemon-chip"
+                                                      th:text="${ability}">
+                                                    static
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="pokemon-section">
+                                            <h4>Estadísticas base</h4>
+                                            <div class="pokemon-stat-list">
+                                                <div th:each="stat : ${result.pokemonDetails.stats}" class="pokemon-stat-row">
+                                                    <div class="pokemon-stat-top">
+                                                        <span class="pokemon-stat-name" th:text="${stat.displayName}">Ataque</span>
+                                                        <span class="pokemon-stat-value" th:text="${stat.value}">55</span>
+                                                    </div>
+                                                    <progress class="progress progress-accent w-full"
+                                                              th:value="${stat.percent}"
+                                                              max="100"></progress>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div th:if="${result.rawDataJson != null}" class="mt-6">
+                                <details class="collapse collapse-arrow border border-base-300 bg-base-100">
+                                    <summary class="collapse-title text-lg font-bold">
+                                        Ver JSON técnico devuelto por Flask
+                                    </summary>
+                                    <div class="collapse-content">
+                                        <div class="mockup-code mt-2">
+                                            <pre><code th:text="${result.rawDataJson}">json</code></pre>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+
+                            <div th:if="${result.rawErrorJson != null}" class="mt-6">
+                                <details class="collapse collapse-arrow border border-error/30 bg-base-100">
+                                    <summary class="collapse-title text-lg font-bold text-error">
+                                        Ver JSON técnico de error recibido desde Flask
+                                    </summary>
+                                    <div class="collapse-content">
+                                        <div class="mockup-code mt-2">
+                                            <pre><code th:text="${result.rawErrorJson}">json</code></pre>
+                                        </div>
+                                    </div>
+                                </details>
                             </div>
                         </div>
 

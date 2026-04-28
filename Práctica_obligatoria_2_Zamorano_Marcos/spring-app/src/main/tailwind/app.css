@@ -7,9 +7,14 @@
 
 /* Ajustes finos propios */
 @layer components {
-  .page-shell {
-    @apply min-h-screen bg-base-200 text-base-content flex flex-col;
-  }
+   .page-shell {
+      @apply relative min-h-screen text-base-content flex flex-col overflow-x-hidden;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.14) 0%, transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 24%),
+        radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.10) 0%, transparent 26%),
+        linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #ecfeff 100%);
+   }
 
   .page-main {
     @apply flex-1;
@@ -20,7 +25,7 @@
   }
 
   .page-card {
-    @apply card bg-base-100 shadow-xl border border-base-300;
+    @apply card border border-base-100/70 bg-base-100/85 shadow-xl backdrop-blur-md;
   }
 
   .page-card-body {
@@ -36,7 +41,7 @@
   }
 
   .footer-shell {
-    @apply border-t border-base-300 bg-base-100/95 backdrop-blur;
+    @apply border-t border-base-300/60 bg-base-100/75 backdrop-blur-md;
   }
 
   .footer-inner {
@@ -73,5 +78,102 @@
 
   .sidebar-section-title {
     @apply px-4 pb-2 pt-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-content/60;
+  }
+
+  /* Pokemon */
+  .pokemon-battle-card {
+    @apply rounded-3xl border border-accent/30 bg-gradient-to-br from-slate-950 via-indigo-950 to-cyan-950 p-6 text-white shadow-2xl;
+  }
+
+  .pokemon-battle-header {
+    @apply flex flex-col gap-4 border-b border-white/10 pb-5 md:flex-row md:items-center md:justify-between;
+  }
+
+  .pokemon-kicker {
+    @apply text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300;
+  }
+
+  .pokemon-name {
+    @apply mt-2 text-4xl font-extrabold tracking-tight text-white;
+  }
+
+  .pokemon-subtitle {
+    @apply mt-2 text-sm text-slate-300;
+  }
+
+  .pokemon-type-list {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .pokemon-type-badge {
+    @apply rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm font-bold uppercase tracking-wide text-cyan-200;
+  }
+
+  .pokemon-battle-grid {
+    @apply mt-6 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)];
+  }
+
+  .pokemon-art-panel {
+    @apply rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm;
+  }
+
+  .pokemon-artwork {
+    @apply mx-auto h-64 w-64 object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.35)];
+  }
+
+  .pokemon-core-stats {
+    @apply mt-6 grid gap-3;
+  }
+
+  .pokemon-core-stat {
+    @apply flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3;
+  }
+
+  .pokemon-core-label {
+    @apply text-sm font-semibold uppercase tracking-wide text-slate-300;
+  }
+
+  .pokemon-core-value {
+    @apply text-lg font-bold text-cyan-200;
+  }
+
+  .pokemon-info-panel {
+    @apply rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm;
+  }
+
+  .pokemon-section {
+    @apply mb-6 last:mb-0;
+  }
+
+  .pokemon-section h4 {
+    @apply mb-3 text-lg font-bold text-cyan-200;
+  }
+
+  .pokemon-chip-list {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .pokemon-chip {
+    @apply rounded-full border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-2 text-sm font-semibold text-fuchsia-100;
+  }
+
+  .pokemon-stat-list {
+    @apply space-y-4;
+  }
+
+  .pokemon-stat-row {
+    @apply rounded-xl border border-white/10 bg-black/20 p-3;
+  }
+
+  .pokemon-stat-top {
+    @apply mb-2 flex items-center justify-between;
+  }
+
+  .pokemon-stat-name {
+    @apply font-semibold text-slate-200;
+  }
+
+  .pokemon-stat-value {
+    @apply text-sm font-bold text-cyan-200;
   }
 }

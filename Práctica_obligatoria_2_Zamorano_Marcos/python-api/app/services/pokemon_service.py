@@ -39,7 +39,27 @@ def get_pokemon(name: str) -> dict:
             "id": payload["id"],
             "height": payload["height"],
             "weight": payload["weight"],
-            "types": [item["type"]["name"] for item in payload.get("types", [])]
+            "base_experience": payload.get("base_experience"),
+            "types": [item["type"]["name"] for item in payload.get("types", [])],
+            "abilities": [
+                item["ability"]["name"] for item in payload.get("abilities", [])
+            ],
+            "stats": [
+                {
+                    "name": item["stat"]["name"],
+                    "value": item["base_stat"]
+                }
+                for item in payload.get("stats", [])
+            ],
+            "sprites": {
+                "official_artwork": (
+                    payload.get("sprites", {})
+                    .get("other", {})
+                    .get("official-artwork", {})
+                    .get("front_default")
+                ),
+                "front_default": payload.get("sprites", {}).get("front_default")
+            }
         }
 
     except requests.exceptions.Timeout as exc:

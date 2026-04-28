@@ -1,5 +1,7 @@
 package com.marcoszamorano.practica2.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcoszamorano.practica2.dto.ApiErrorResponse;
 import com.marcoszamorano.practica2.dto.LabResponseView;
 import com.marcoszamorano.practica2.exception.RemoteServiceException;
@@ -7,6 +9,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ErrorTranslatorService {
+
+    private final ObjectMapper objectMapper;
+
+    public ErrorTranslatorService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public LabResponseView translate(RemoteServiceException ex, String operationLabel) {
         ApiErrorResponse error = ex.getErrorResponse();
@@ -22,8 +30,18 @@ public class ErrorTranslatorService {
         view.setCritical(error.getCritical());
         view.setTimestamp(error.getTimestamp());
         view.setRawDataJson(null);
+        view.setRawErrorJson(prettyJson(error));
+        view.setPokemonDetails(null);
 
         return view;
+    }
+
+    private String prettyJson(Object data) {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            return String.valueOf(data);
+        }
     }
 
     private String resolveFriendlyMessage(ApiErrorResponse error) {

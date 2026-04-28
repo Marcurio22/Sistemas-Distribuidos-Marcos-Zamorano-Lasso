@@ -1,5 +1,7 @@
 package com.marcoszamorano.practica2.dto;
 
+import com.marcoszamorano.practica2.dto.lab.PokemonDetailsView;
+
 public class LabResponseView {
 
     private boolean success;
@@ -12,6 +14,8 @@ public class LabResponseView {
     private Boolean critical;
     private String timestamp;
     private String rawDataJson;
+    private String rawErrorJson;
+    private PokemonDetailsView pokemonDetails;
 
     public LabResponseView() {
     }
@@ -94,5 +98,21 @@ public class LabResponseView {
 
     public void setRawDataJson(String rawDataJson) {
         this.rawDataJson = rawDataJson;
+    }
+
+    public String getRawErrorJson() {
+        return rawErrorJson;
+    }
+
+    public void setRawErrorJson(String rawErrorJson) {
+        this.rawErrorJson = rawErrorJson;
+    }
+
+    public PokemonDetailsView getPokemonDetails() {
+        return pokemonDetails;
+    }
+
+    public void setPokemonDetails(PokemonDetailsView pokemonDetails) {
+        this.pokemonDetails = pokemonDetails;
     }
 }

@@ -12,6 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.marcoszamorano.practica2.dto.lab.PokemonDetailsView;
+import com.marcoszamorano.practica2.dto.lab.PokemonStatView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import java.util.function.Supplier;
 
@@ -92,7 +97,80 @@ public class LabController {
         view.setCritical(false);
         view.setTimestamp(response.getTimestamp());
         view.setRawDataJson(prettyJson(response.getData()));
+
+        if ("get_pokemon".equals(response.getOperation())) {
+            view.setPokemonDetails(mapPokemonDetails(response.getData()));
+        }
+
         return view;
+    }
+
+    private PokemonDetailsView mapPokemonDetails(Map<String, Object> data) {
+        if (data == null) {
+            return null;
+        }
+
+        PokemonDetailsView details = new PokemonDetailsView();
+        details.setId(asInteger(data.get("id")));
+        details.setName(asString(data.get("name")));
+        details.setHeight(asInteger(data.get("height")));
+        details.setWeight(asInteger(data.get("weight")));
+        details.setBaseExperience(asInteger(data.get("base_experience")));
+        details.setTypes(asStringList(data.get("types")));
+        details.setAbilities(asStringList(data.get("abilities")));
+
+        Object spritesObj = data.get("sprites");
+        if (spritesObj instanceof Map<?, ?> spritesMap) {
+            details.setOfficialArtwork(asString(spritesMap.get("official_artwork")));
+            details.setFrontDefault(asString(spritesMap.get("front_default")));
+        }
+
+        details.setStats(asPokemonStats(data.get("stats")));
+        return details;
+    }
+
+    private Integer asInteger(Object value) {
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        return null;
+    }
+
+    private String asString(Object value) {
+        return value instanceof String s ? s : null;
+    }
+
+    private List<String> asStringList(Object value) {
+        List<String> result = new ArrayList<>();
+
+        if (value instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof String s) {
+                    result.add(s);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private List<PokemonStatView> asPokemonStats(Object value) {
+        List<PokemonStatView> result = new ArrayList<>();
+
+        if (value instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> statMap) {
+                    String statName = asString(statMap.get("name"));
+                    Integer statValue = asInteger(statMap.get("value"));
+
+                    if (statName != null && statValue != null) {
+                        result.add(new PokemonStatView(statName, statValue));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private String prettyJson(Object data) {
