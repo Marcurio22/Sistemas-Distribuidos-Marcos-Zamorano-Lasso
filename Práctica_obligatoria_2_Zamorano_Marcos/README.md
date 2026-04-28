@@ -425,14 +425,21 @@ Tengo también una carpeta `docs/capturas/` con las siguientes imágenes para fa
 * home
 * login
 * registro
-* dashboard con token UUID
+* menú lateral
+* dashboard
 * laboratorio con Pokémon correcto
+* laboratorio con Pokémon incorrecto
+* laboratorio con fichero ok
 * laboratorio con error de fichero
+* laboratorio con fichero prohibido
+* laboratorio con consulta SQL ok
 * laboratorio con error SQL
 * laboratorio con timeout
 * Postman health
 * Postman error de base de datos
-* Docker Desktop o `docker compose ps` mostrando contenedores levantados
+* Docker Desktop mostrando contenedores levantados
+* Docker Compose up
+* Tabla users en MySQL
 
 
 ## 16. Conclusiones
