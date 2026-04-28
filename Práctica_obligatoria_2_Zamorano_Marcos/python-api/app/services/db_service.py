@@ -4,6 +4,13 @@ from app.infra.mysql_client import get_connection
 
 
 def list_users() -> dict:
+    """
+    Consulta los usuarios existentes en la base de datos.
+
+    Esta operación representa el caso correcto de acceso a MySQL desde Flask.
+    Se utiliza tanto en Postman como en el laboratorio para demostrar que el
+    servicio Python puede acceder correctamente a la información persistida.
+    """
     connection = None
     cursor = None
 
@@ -19,6 +26,7 @@ def list_users() -> dict:
 
         rows = cursor.fetchall()
 
+        # Se serializan las fechas para que puedan viajar bien en JSON.
         for row in rows:
             if row.get("last_login_at") is not None:
                 row["last_login_at"] = row["last_login_at"].isoformat()
@@ -37,6 +45,8 @@ def list_users() -> dict:
             critical=True
         ) from exc
     finally:
+        # El cierre explícito de cursor y conexión evita fugas de recursos
+        # y deja clara la intención de liberar la conexión al terminar.
         if cursor is not None:
             cursor.close()
         if connection is not None and connection.is_connected():
@@ -44,6 +54,12 @@ def list_users() -> dict:
 
 
 def force_database_error() -> dict:
+    """
+    Lanza de forma intencionada un error SQL controlado.
+
+    Este método no representa un caso funcional real, sino una prueba académica
+    para demostrar el tratamiento de excepciones de acceso a datos.
+    """
     connection = None
     cursor = None
 

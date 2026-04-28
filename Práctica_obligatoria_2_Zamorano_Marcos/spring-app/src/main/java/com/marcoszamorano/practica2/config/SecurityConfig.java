@@ -15,11 +15,21 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * Codificador de contraseñas usado en todo el sistema.
+     * Se utiliza BCrypt por ser una opción estándar y segura para almacenar
+     * contraseñas cifradas en base de datos.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Proveedor de autenticación basado en base de datos.
+     * Spring Security delega en UserService la carga del usuario y utiliza
+     * el PasswordEncoder anterior para comparar la contraseña introducida.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(UserService userService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -28,6 +38,16 @@ public class SecurityConfig {
         return provider;
     }
 
+    /**
+     * Handler ejecutado cuando el login se completa correctamente.
+     * Aquí se aprovecha para registrar el acceso en base de datos:
+     * - se genera el token UUID de sesión
+     * - se actualiza la fecha del último login
+     * - se guarda la información mínima en la sesión HTTP
+     *
+     * Después de esto se redirige al laboratorio, que es la pantalla central
+     * de demostración de la práctica.
+     */
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler(UserService userService) {
         return (request, response, authentication) -> {
@@ -36,6 +56,11 @@ public class SecurityConfig {
         };
     }
 
+    /**
+     * Handler ejecutado al cerrar sesión.
+     * Si el usuario estaba autenticado, se limpia el token persistido en base
+     * de datos y se redirige al login indicando que el logout ha sido correcto.
+     */
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler(UserService userService) {
         return (request, response, authentication) -> {
@@ -46,6 +71,16 @@ public class SecurityConfig {
         };
     }
 
+    /**
+     * Configuración principal de seguridad de Spring.
+     *
+     * Decisiones adoptadas:
+     * - Home, login, registro y recursos estáticos son públicos
+     * - El resto de rutas requieren autenticación
+     * - Se usa formulario de login personalizado
+     * - El logout invalida la sesión y elimina la cookie JSESSIONID
+     * - Los accesos denegados redirigen a una vista 403 propia
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            AuthenticationProvider authenticationProvider,

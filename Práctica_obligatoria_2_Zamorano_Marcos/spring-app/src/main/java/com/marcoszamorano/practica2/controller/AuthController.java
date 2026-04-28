@@ -15,12 +15,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class AuthController {
 
+    /**
+     * Controlador responsable de la parte pública de autenticación:
+     * - login
+     * - registro
+     *
+     * No gestiona la autenticación en sí, ya que eso lo realiza Spring Security,
+     * pero sí controla las vistas y el tratamiento de errores del registro.
+     */
     private final UserService userService;
 
     public AuthController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Si el usuario ya está autenticado, no tiene sentido volver a mostrar
+     * la pantalla de login, por lo que se redirige al dashboard.
+     */
     @GetMapping("/login")
     public String login(Authentication authentication) {
         if (isAuthenticated(authentication)) {
@@ -29,6 +41,11 @@ public class AuthController {
         return "login";
     }
 
+    /**
+     * Muestra el formulario de registro.
+     * Si el usuario ya ha iniciado sesión, se evita el registro redundante
+     * redirigiéndolo también al dashboard.
+     */
     @GetMapping("/register")
     public String registerForm(Authentication authentication, Model model) {
         if (isAuthenticated(authentication)) {
@@ -42,6 +59,17 @@ public class AuthController {
         return "register";
     }
 
+    /**
+     * Procesa el formulario de registro.
+     *
+     * Casos contemplados:
+     * - validación funcional de campos
+     * - errores de integridad de base de datos
+     * - errores inesperados
+     *
+     * En todos los casos se intenta volver a la misma vista con un mensaje
+     * adecuado, evitando que el usuario vea un error genérico.
+     */
     @PostMapping("/register")
     public String register(@ModelAttribute("registerForm") RegisterForm registerForm,
                            Authentication authentication,
@@ -71,6 +99,10 @@ public class AuthController {
         }
     }
 
+    /**
+     * Utilidad para comprobar si la autenticación actual corresponde
+     * a un usuario real y no a un token anónimo de Spring Security.
+     */
     private boolean isAuthenticated(Authentication authentication) {
         return authentication != null
                 && authentication.isAuthenticated()

@@ -10,12 +10,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ErrorTranslatorService {
 
+    /**
+     * Servicio encargado de convertir errores remotos técnicos en una
+     * representación adecuada para la vista del laboratorio.
+     *
+     * La idea principal es que Spring no muestre directamente el error bruto
+     * recibido desde Flask, sino una versión traducida y comprensible para el usuario.
+     */
     private final ObjectMapper objectMapper;
 
     public ErrorTranslatorService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Traduce una excepción remota a LabResponseView, para que
+     * Thymeleaf muestre el resultado del laboratorio.
+     *
+     * Además del mensaje traducido, se conserva una versión JSON del error
+     * para fines académicos y de depuración dentro de /lab.
+     */
     public LabResponseView translate(RemoteServiceException ex, String operationLabel) {
         ApiErrorResponse error = ex.getErrorResponse();
 
@@ -36,6 +50,10 @@ public class ErrorTranslatorService {
         return view;
     }
 
+    /**
+     * Convierte el error a JSON para mostrarlo como bloque técnico
+     * plegable dentro del laboratorio.
+     */
     private String prettyJson(Object data) {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
@@ -44,6 +62,10 @@ public class ErrorTranslatorService {
         }
     }
 
+    /**
+     * Traduce códigos de error remotos a mensajes más naturales y adaptados
+     * al contexto del frontend.
+     */
     private String resolveFriendlyMessage(ApiErrorResponse error) {
         if (error == null || error.getErrorCode() == null) {
             return "Se ha producido un error remoto no identificado.";

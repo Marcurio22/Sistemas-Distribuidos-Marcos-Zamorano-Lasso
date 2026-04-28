@@ -21,6 +21,10 @@ import java.util.regex.Pattern;
 @Service
 public class UserService implements UserDetailsService {
 
+    /**
+     * Expresión regular sencilla para validar el formato del email
+     * durante el proceso de registro.
+     */
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
@@ -32,6 +36,10 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Método requerido por Spring Security para cargar un usuario a partir
+     * de su username durante el login.
+     */
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -46,12 +54,24 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * Recupera la entidad completa del usuario desde base de datos.
+     */
     @Transactional(readOnly = true)
     public User getByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + username));
     }
 
+    /**
+     * Registra un login correcto.
+     *
+     * Para ello:
+     * - se genera un UUID
+     * - se persiste en la tabla users
+     * - se actualiza la fecha de último acceso
+     * - se copia también la información mínima a la sesión HTTP
+     */
     @Transactional
     public String registerSuccessfulLogin(String username, HttpSession session) {
         User user = getByUsername(username);
@@ -69,6 +89,10 @@ public class UserService implements UserDetailsService {
         return token;
     }
 
+    /**
+     * Limpia el token persistido cuando el usuario cierra sesión.
+     * Así queda reflejado en base de datos que ya no existe una sesión activa.
+     */
     @Transactional
     public void clearSessionToken(String username) {
         userRepository.findByUsername(username).ifPresent(user -> {
@@ -77,6 +101,19 @@ public class UserService implements UserDetailsService {
         });
     }
 
+    /**
+     * Registra un usuario nuevo en la aplicación.
+     *
+     * Antes de persistir se validan:
+     * - nombre de usuario
+     * - email
+     * - contraseña
+     * - confirmación de contraseña
+     * - duplicados por username y email
+     *
+     * Si alguna validación falla, se lanza una excepción específica con
+     * errores por campo para poder mostrarlos después en la vista.
+     */
     @Transactional
     public void registerNewUser(RegisterForm form) {
         Map<String, String> errors = new LinkedHashMap<>();
@@ -130,6 +167,10 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    /**
+     * Normaliza cadenas recibidas desde formularios evitando nulos
+     * y recortando espacios laterales.
+     */
     private String safeTrim(String value) {
         return value == null ? "" : value.trim();
     }

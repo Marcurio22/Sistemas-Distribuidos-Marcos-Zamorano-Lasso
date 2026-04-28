@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcoszamorano.practica2.dto.ApiSuccessResponse;
 import com.marcoszamorano.practica2.dto.LabResponseView;
+import com.marcoszamorano.practica2.dto.lab.PokemonDetailsView;
+import com.marcoszamorano.practica2.dto.lab.PokemonStatView;
 import com.marcoszamorano.practica2.exception.RemoteServiceException;
 import com.marcoszamorano.practica2.service.ErrorTranslatorService;
 import com.marcoszamorano.practica2.service.FlaskGatewayService;
@@ -12,18 +14,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.marcoszamorano.practica2.dto.lab.PokemonDetailsView;
-import com.marcoszamorano.practica2.dto.lab.PokemonStatView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import java.util.function.Supplier;
 
 @Controller
 @RequestMapping("/lab")
 public class LabController {
 
+    /**
+     * Este controlador es el núcleo del laboratorio web.
+     * Desde aquí se reciben las acciones del usuario en /lab,
+     * se invoca a Flask mediante FlaskGatewayService y se construye
+     * una vista final adaptada a Thymeleaf.
+     */
     private final FlaskGatewayService flaskGatewayService;
     private final ErrorTranslatorService errorTranslatorService;
     private final ObjectMapper objectMapper;
@@ -38,6 +44,10 @@ public class LabController {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Carga inicial de la pantalla del laboratorio.
+     * No muestra resultados todavía, solo la interfaz de pruebas.
+     */
     @GetMapping
     public String labHome(Model model) {
         model.addAttribute("result", null);
@@ -69,6 +79,13 @@ public class LabController {
         return execute("Simulación de timeout (" + seconds + " s)", () -> flaskGatewayService.simulateTimeout(seconds), model);
     }
 
+    /**
+     * Método común que centraliza el patrón de ejecución del laboratorio:
+     * - invocar Flask
+     * - si hay éxito, construir la respuesta visual de éxito
+     * - si hay error remoto, traducirlo
+     * - si ocurre algo inesperado, generar un error interno controlado
+     */
     private String execute(String operationLabel, Supplier<ApiSuccessResponse> action, Model model) {
         try {
             ApiSuccessResponse response = action.get();
@@ -85,6 +102,10 @@ public class LabController {
         return "lab";
     }
 
+    /**
+     * Construye el objeto que la vista Thymeleaf utilizará para representar
+     * un caso correcto del laboratorio.
+     */
     private LabResponseView buildSuccessView(String operationLabel, ApiSuccessResponse response) {
         LabResponseView view = new LabResponseView();
         view.setSuccess(true);
@@ -105,6 +126,10 @@ public class LabController {
         return view;
     }
 
+    /**
+     * Convierte el Map genérico recibido desde Flask en un modelo tipado
+     * para la ficha visual del Pokémon.
+     */
     private PokemonDetailsView mapPokemonDetails(Map<String, Object> data) {
         if (data == null) {
             return null;
@@ -154,6 +179,10 @@ public class LabController {
         return result;
     }
 
+    /**
+     * Mapea la lista de estadísticas del Pokémon a una representación
+     * específica de la vista, que incluye además porcentaje para barras.
+     */
     private List<PokemonStatView> asPokemonStats(Object value) {
         List<PokemonStatView> result = new ArrayList<>();
 
@@ -173,6 +202,10 @@ public class LabController {
         return result;
     }
 
+    /**
+     * Convierte cualquier estructura a JSON para mostrarla en el
+     * laboratorio como información técnica secundaria.
+     */
     private String prettyJson(Object data) {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);

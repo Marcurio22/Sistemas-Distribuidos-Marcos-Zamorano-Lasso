@@ -19,6 +19,15 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class FlaskGatewayService {
 
+    /**
+     * Esta clase encapsula toda la comunicación HTTP entre Spring y Flask.
+     *
+     * Su responsabilidad es:
+     * - construir las URLs de Flask
+     * - invocar los endpoints
+     * - interpretar respuestas correctas
+     * - transformar errores HTTP, timeout o conectividad en excepciones propias
+     */
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final String pythonBaseUrl;
@@ -64,6 +73,15 @@ public class FlaskGatewayService {
         return performGet(url);
     }
 
+    /**
+     * Método común para todas las llamadas GET al servicio Flask.
+     *
+     * Flujo:
+     * - si la respuesta es correcta, devuelve su body
+     * - si Flask responde con error HTTP, se parsea su JSON de error
+     * - si hay timeout, se lanza una excepción específica
+     * - si Flask no está disponible, se informa como servicio remoto caído
+     */
     private ApiSuccessResponse performGet(String url) {
         try {
             ResponseEntity<ApiSuccessResponse> response =
@@ -92,6 +110,10 @@ public class FlaskGatewayService {
         }
     }
 
+    /**
+     * Intenta distinguir si un ResourceAccessException corresponde realmente
+     * a un timeout de lectura/conexión.
+     */
     private boolean isTimeout(ResourceAccessException ex) {
         Throwable cause = ex.getCause();
         if (cause instanceof SocketTimeoutException) {
@@ -101,6 +123,12 @@ public class FlaskGatewayService {
         return message != null && message.toLowerCase().contains("timed out");
     }
 
+    /**
+     * Convierte el JSON de error devuelto por Flask en ApiErrorResponse.
+     *
+     * Si no se puede parsear correctamente, se construye un error de respaldo
+     * para no perder información y mantener el flujo de tratamiento homogéneo.
+     */
     private ApiErrorResponse parseRemoteError(HttpStatusCodeException ex) {
         try {
             String body = ex.getResponseBodyAsString();

@@ -1,12 +1,24 @@
 from pathlib import Path
 from app.errors.custom_exceptions import FileAccessException
 
+# Directorio base donde se encuentran los ficheros de prueba del laboratorio.
 FILES_BASE_PATH = Path(__file__).resolve().parents[2] / "files"
 
 
 def read_file(filename: str) -> dict:
+    """
+    Lee un fichero de prueba del laboratorio o lanza una excepción controlada.
+
+    Casos cubiertos:
+    - nombre de fichero no válido
+    - acceso prohibido simulado
+    - fichero inexistente
+    - error real de lectura
+    """
     safe_name = Path(filename).name
 
+    # Se evita que el usuario pueda intentar rutas arbitrarias como ../..
+    # y se restringe la lectura al nombre simple del fichero.
     if safe_name != filename:
         raise FileAccessException(
             error_code="INVALID_FILE_NAME",
@@ -16,6 +28,7 @@ def read_file(filename: str) -> dict:
             critical=False
         )
 
+    # Caso didáctico: acceso prohibido simulado.
     if safe_name == "confidential.txt":
         raise FileAccessException(
             error_code="FILE_FORBIDDEN",
