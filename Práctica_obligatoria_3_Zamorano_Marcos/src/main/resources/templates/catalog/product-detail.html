@@ -1,5 +1,5 @@
 <!--
-  El Plantío 360 - Detalle de producto.
+  El Plantío 360 - Detalle de producto y checkout simulado.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
@@ -8,28 +8,75 @@
 <head th:replace="~{fragments/common :: head(${product.name})}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div><div class="card plantio-card"><div class="card-body p-6">
-            <img class="product-img mb-3" th:src="${product.imageUrl}" alt="Producto">
-            <div class="flex items-start justify-between gap-3">
-                <h1 th:text="${product.name}">Producto</h1>
-                <span th:if="${product.name == 'Pack día de partido'}" class="badge badge-accent whitespace-nowrap">Oferta limitada</span>
+    <div class="grid gap-7 lg:grid-cols-[1fr_0.95fr]">
+        <section class="card plantio-card">
+            <div class="card-body p-6 md:p-8">
+                <img class="product-img product-detail-img mb-5" th:src="${product.imageUrl}" th:alt="${product.name}">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <h1 class="text-3xl font-black leading-tight" th:text="${product.name}">Producto</h1>
+                    <span th:if="${product.name == 'Pack día de partido'}" class="badge badge-accent whitespace-nowrap">Oferta limitada</span>
+                </div>
+                <p class="text-lg leading-8 text-slate-700" th:text="${product.description}">Descripción</p>
+                <div class="mt-2 grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                        <span class="block text-xs font-black uppercase tracking-wider text-slate-500">Categoría</span>
+                        <strong th:text="${product.category}">Categoría</strong>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                        <span class="block text-xs font-black uppercase tracking-wider text-slate-500">Precio</span>
+                        <strong th:text="${product.price} + ' €'"></strong>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                        <span class="block text-xs font-black uppercase tracking-wider text-slate-500">Stock</span>
+                        <strong th:text="${product.stock}">0</strong>
+                    </div>
+                </div>
             </div>
-            <p class="text-lg leading-8 text-slate-700" th:text="${product.description}">Descripción</p>
-            <p>Categoría: <strong th:text="${product.category}">Categoría</strong></p>
-            <p>Precio: <strong th:text="${product.price} + ' €'"></strong></p>
-        </div></div></div>
-        <div><div class="card plantio-card"><div class="card-body p-6">
-            <h2 class="text-2xl font-black">Checkout</h2>
-            <form th:action="@{/checkout/product/{id}(id=${product.id})}" th:object="${checkout}" method="post">
-                <label class="field-label">Cantidad</label><input class="input input-bordered w-full mb-3" th:field="*{quantity}" type="number" min="1" value="1">
-                <label class="field-label">Titular</label><input class="input input-bordered w-full mb-3" th:field="*{cardHolder}" required>
-                <label class="field-label">Tarjeta ficticia</label><input class="input input-bordered w-full mb-3" th:field="*{cardNumber}" value="4242424242424242" required>
-                <div class="grid gap-5 md:grid-cols-2"><div><label class="field-label">Caducidad</label><input class="input input-bordered w-full mb-3" th:field="*{expiry}" placeholder="12/30"></div><div><label class="field-label">CVV</label><input class="input input-bordered w-full mb-3" th:field="*{cvv}" placeholder="123"></div></div>
-                <button class="btn btn-accent w-full">Pagar pedido</button>
-            </form>
-        </div></div></div>
+        </section>
+
+        <section class="card plantio-card">
+            <div class="card-body p-6 md:p-8">
+                <h2 class="text-2xl font-black">Checkout</h2>
+                <p class="text-sm font-semibold text-slate-600">Pasarela de pago simulada para defensa académica. No se almacena ningún dato real de pago.</p>
+                <form class="mt-3 space-y-4" th:action="@{/checkout/product/{id}(id=${product.id})}" th:object="${checkout}" method="post" autocomplete="off" data-form-type="other">
+                    <div>
+                        <label class="field-label" for="quantity">Cantidad</label>
+                        <input id="quantity" class="input input-bordered w-full" th:field="*{quantity}" type="number" min="1" th:max="${product.stock}" value="1" data-stock-limited th:data-stock="${product.stock}" required>
+                        <small class="auth-help" th:text="'Máximo disponible: ' + ${product.stock} + ' unidades.'">Máximo disponible: 0 unidades.</small>
+                    </div>
+
+                    <input type="hidden" th:field="*{cardHolder}" data-demo-holder-hidden>
+                    <input type="hidden" th:field="*{cardNumber}" data-demo-number-hidden>
+                    <input type="hidden" th:field="*{expiry}" data-demo-expiry-hidden>
+                    <input type="hidden" th:field="*{cvv}" data-demo-cvv-hidden>
+
+                    <div>
+                        <label class="field-label" for="demoHolderInput">Titular del pedido</label>
+                        <input id="demoHolderInput" name="demoHolderInput" class="input input-bordered w-full" type="text" placeholder="Ej: Marcos Zamorano" autocomplete="off" data-form-type="other" data-demo-holder-input required>
+                    </div>
+                    <div>
+                        <label class="field-label" for="demoNumberInput">Código de pago simulado</label>
+                        <input id="demoNumberInput" name="demoNumberInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" autocomplete="off" data-form-type="other" data-demo-number-input required>
+                    </div>
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <div>
+                            <label class="field-label" for="demoExpiryInput">Caducidad</label>
+                            <input id="demoExpiryInput" name="demoExpiryInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="5" placeholder="12/30" autocomplete="off" data-form-type="other" data-demo-expiry-input required>
+                        </div>
+                        <div>
+                            <label class="field-label" for="demoCvvInput">Código de seguridad simulado</label>
+                            <input id="demoCvvInput" name="demoCvvInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="off" data-form-type="other" data-demo-cvv-input required>
+                        </div>
+                    </div>
+                    <button class="btn btn-accent w-full" th:disabled="${product.stock == null or product.stock <= 0}" type="submit">
+                        <span th:if="${product.stock != null and product.stock > 0}">Pagar pedido</span>
+                        <span th:if="${product.stock == null or product.stock <= 0}">Sin stock disponible</span>
+                    </button>
+                </form>
+            </div>
+        </section>
     </div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

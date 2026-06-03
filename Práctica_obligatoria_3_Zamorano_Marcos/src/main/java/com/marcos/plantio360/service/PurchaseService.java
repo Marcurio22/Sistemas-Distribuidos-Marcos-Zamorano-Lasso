@@ -91,8 +91,12 @@ public class PurchaseService {
     public PlantioOrder buyProduct(AppUser user, Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
         int safeQuantity = Math.max(quantity, 1);
-        if (product.getStock() == null || product.getStock() < safeQuantity) {
-            throw new IllegalStateException("Stock insuficiente");
+        int availableStock = product.getStock() == null ? 0 : product.getStock();
+        if (availableStock <= 0) {
+            throw new IllegalStateException("Este producto no tiene stock disponible ahora mismo.");
+        }
+        if (safeQuantity > availableStock) {
+            throw new IllegalStateException("Solo quedan " + availableStock + " unidades disponibles. Ajusta la cantidad para continuar.");
         }
         product.setStock(product.getStock() - safeQuantity);
         productRepository.save(product);

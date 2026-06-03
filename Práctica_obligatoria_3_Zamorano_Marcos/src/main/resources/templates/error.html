@@ -1,0 +1,30 @@
+<!--
+  El Plantío 360 - Página de error controlada.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Error controlado')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="app-shell py-12">
+    <section class="card plantio-card max-w-3xl mx-auto">
+        <div class="card-body p-8 text-center">
+            <img class="mx-auto h-20 w-20 object-contain" th:src="@{/images/burgos-cf-shield.png}" alt="Escudo Burgos CF">
+            <p class="mt-3 text-sm font-black uppercase tracking-[.18em] text-plantio-emerald">Error controlado</p>
+            <h1 class="mt-2 text-4xl font-black">No se ha podido completar la operación</h1>
+            <p class="mt-3 text-slate-600">
+                La aplicación ha capturado un problema inesperado. Vuelve a la página anterior o regresa al inicio para continuar navegando.
+            </p>
+            <div class="mt-6 flex flex-wrap justify-center gap-3">
+                <a class="btn btn-primary" th:href="@{/}">Volver al inicio</a>
+                <a class="btn btn-outline btn-primary" th:href="@{/shop}">Ir a la tienda</a>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

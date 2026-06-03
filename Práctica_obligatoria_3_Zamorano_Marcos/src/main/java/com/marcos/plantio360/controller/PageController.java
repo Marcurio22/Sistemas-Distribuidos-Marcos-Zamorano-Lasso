@@ -133,12 +133,17 @@ public class PageController {
         return "redirect:/my-tickets";
     }
 
-    /** Ejecuta compra de producto. */
+    /** Ejecuta compra de producto y devuelve errores controlados si no hay stock suficiente. */
     @PostMapping("/checkout/product/{productId}")
     public String buyProduct(@PathVariable Long productId, @ModelAttribute CheckoutRequest request, RedirectAttributes redirectAttributes) {
-        purchaseService.buyProduct(currentUserService.require(), productId, request.getQuantity() == null ? 1 : request.getQuantity());
-        redirectAttributes.addFlashAttribute("success", "Pedido confirmado correctamente. Revisa MailHog.");
-        return "redirect:/orders";
+        try {
+            purchaseService.buyProduct(currentUserService.require(), productId, request.getQuantity() == null ? 1 : request.getQuantity());
+            redirectAttributes.addFlashAttribute("success", "Pedido confirmado correctamente. Correo simulado disponible en MailHog.");
+            return "redirect:/orders";
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+            return "redirect:/shop/" + productId;
+        }
     }
 
     /** Fuerza sincronización manual de sensores desde Flask. */

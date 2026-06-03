@@ -88,6 +88,75 @@ function initFlashToasts() {
     });
 }
 
+
+/**
+ * Inicializa controles del checkout simulado: límite de stock y formato visual de la tarjeta ficticia.
+ */
+function initCheckoutControls() {
+    document.querySelectorAll('[data-stock-limited]').forEach(input => {
+        const stock = Number(input.dataset.stock || input.getAttribute('max') || 0);
+        const normalizeQuantity = () => {
+            let value = Number(input.value || 1);
+            if (Number.isNaN(value) || value < 1) value = 1;
+            if (stock > 0 && value > stock) value = stock;
+            input.value = String(value);
+        };
+        input.addEventListener('input', normalizeQuantity);
+        input.addEventListener('blur', normalizeQuantity);
+        normalizeQuantity();
+    });
+
+    const cardInput = document.querySelector('[data-demo-number-input]');
+    const cardHidden = document.querySelector('[data-demo-number-hidden]');
+    const holderInput = document.querySelector('[data-demo-holder-input]');
+    const holderHidden = document.querySelector('[data-demo-holder-hidden]');
+    const expiryInput = document.querySelector('[data-demo-expiry-input]');
+    const expiryHidden = document.querySelector('[data-demo-expiry-hidden]');
+    const cvvInput = document.querySelector('[data-demo-cvv-input]');
+    const cvvHidden = document.querySelector('[data-demo-cvv-hidden]');
+
+    if (cardInput && cardHidden) {
+        const formatCard = () => {
+            const digits = cardInput.value.replace(/\D/g, '').slice(0, 16);
+            cardInput.value = digits.replace(/(.{4})/g, '$1 ').trim();
+            cardHidden.value = digits;
+        };
+        cardInput.addEventListener('input', formatCard);
+        formatCard();
+    }
+    if (expiryInput && expiryHidden) {
+        const formatExpiry = () => {
+            const digits = expiryInput.value.replace(/\D/g, '').slice(0, 4);
+            expiryInput.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+            expiryHidden.value = expiryInput.value;
+        };
+        expiryInput.addEventListener('input', formatExpiry);
+        formatExpiry();
+    }
+    if (cvvInput && cvvHidden) {
+        const formatCvv = () => {
+            cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
+            cvvHidden.value = cvvInput.value;
+        };
+        cvvInput.addEventListener('input', formatCvv);
+        formatCvv();
+    }
+    if (holderInput && holderHidden) {
+        const syncHolder = () => { holderHidden.value = holderInput.value.trim(); };
+        holderInput.addEventListener('input', syncHolder);
+        syncHolder();
+    }
+
+    document.querySelectorAll('form[data-form-type="other"]').forEach(form => {
+        form.addEventListener('submit', () => {
+            if (cardInput && cardHidden) cardHidden.value = cardInput.value.replace(/\D/g, '').slice(0, 16);
+            if (holderInput && holderHidden) holderHidden.value = holderInput.value.trim();
+            if (expiryInput && expiryHidden) expiryHidden.value = expiryInput.value;
+            if (cvvInput && cvvHidden) cvvHidden.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
+        });
+    });
+}
+
 /**
  * Punto de entrada de utilidades de interfaz.
  */
@@ -95,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPlantioMap();
     initPlantioChat();
     initFlashToasts();
+    initCheckoutControls();
 });
 
 

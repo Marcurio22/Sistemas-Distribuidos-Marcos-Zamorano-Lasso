@@ -13,12 +13,12 @@
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div th:each="product : ${products}">
             <div class="card plantio-card h-full"><div class="card-body">
-                <img class="product-img mb-3" th:src="${product.imageUrl}" alt="Producto">
+                <img class="product-img product-card-img mb-4" th:src="${product.imageUrl}" th:alt="${product.name}">
                 <div class="flex items-start justify-between gap-3">
                     <h2 class="text-xl font-black" th:text="${product.name}">Producto</h2>
                     <span th:if="${product.name == 'Pack día de partido'}" class="badge badge-accent whitespace-nowrap">Oferta limitada</span>
                 </div>
-                <p th:text="${product.description}">Descripción</p>
+                <p class="min-h-[4.5rem]" th:text="${product.description}">Descripción</p>
                 <p><strong th:text="${product.price} + ' €'"></strong> · Stock <span th:text="${product.stock}"></span></p>
                 <a class="btn btn-primary" th:href="@{/shop/{id}(id=${product.id})}">Comprar</a>
             </div></div>
