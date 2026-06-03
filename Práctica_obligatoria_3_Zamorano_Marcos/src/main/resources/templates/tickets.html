@@ -9,11 +9,11 @@
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
+<main class="app-shell py-10">
     <h1>Mis entradas</h1>
-    <div class="row g-4">
-        <div class="col-md-4" th:each="ticket : ${tickets}">
-            <div class="ticket-card"><span class="badge text-bg-light">QR simulado</span><h2 class="h5 mt-3" th:text="'Burgos CF vs ' + ${ticket.match.rival}"></h2><p th:text="${ticket.zone} + ' · Asiento ' + ${ticket.seatCode}"></p><code th:text="${ticket.qrCode}"></code></div>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div th:each="ticket : ${tickets}">
+            <div class="ticket-card"><span class="badge badge-ghost">QR simulado</span><h2 class="text-xl font-black mt-3" th:text="'Burgos CF vs ' + ${ticket.match.rival}"></h2><p th:text="${ticket.zone} + ' · Asiento ' + ${ticket.seatCode}"></p><code th:text="${ticket.qrCode}"></code></div>
         </div>
     </div>
 </main>

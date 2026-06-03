@@ -9,8 +9,8 @@
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
-<div class="section-title"><h1>Puntos del mapa</h1><a class="btn btn-primary" th:href="@{/admin/map-points/new}">Nuevo</a></div><table class="table table-hover"><thead><tr><th>Nombre</th><th>Tipo</th><th>Lat</th><th>Lon</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.type}"></td><td th:text="${item.latitude}"></td><td th:text="${item.longitude}"></td><td><a class="btn btn-sm btn-outline-primary" th:href="@{/admin/map-points/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+<main class="app-shell py-10">
+<div class="section-title"><h1>Puntos del mapa</h1><a class="btn btn-primary" th:href="@{/admin/map-points/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Nombre</th><th>Tipo</th><th>Lat</th><th>Lon</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.type}"></td><td th:text="${item.latitude}"></td><td th:text="${item.longitude}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/map-points/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

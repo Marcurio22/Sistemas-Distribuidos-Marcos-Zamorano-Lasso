@@ -6,23 +6,84 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/common :: head('Registro')}"></head>
-<body class="auth-bg">
+<body class="auth-page">
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
-    <div class="row justify-content-center"><div class="col-md-6">
-        <div class="card plantio-card"><div class="card-body p-4">
-            <h1 class="h3 mb-3">Crear cuenta</h1>
-            <form th:action="@{/register}" th:object="${registerRequest}" method="post">
-                <div class="row"><div class="col-md-6"><label class="form-label">Nombre</label><input class="form-control mb-3" th:field="*{firstName}" required></div>
-                <div class="col-md-6"><label class="form-label">Apellidos</label><input class="form-control mb-3" th:field="*{lastName}" required></div></div>
-                <label class="form-label">Email</label><input class="form-control mb-3" th:field="*{email}" type="email" required>
-                <label class="form-label">Teléfono</label><input class="form-control mb-3" th:field="*{phone}">
-                <label class="form-label">Contraseña</label><input class="form-control mb-3" th:field="*{password}" type="password" required>
-                <button class="btn btn-warning w-100">Registrarme</button>
+<main class="auth-shell">
+    <section class="auth-card-grid auth-register-grid">
+        <article class="auth-visual-panel">
+            <div class="auth-visual-copy">
+                <h1>¡ÚNETE!</h1>
+                <p>Crea tu cuenta para desbloquear toda la experiencia de El Plantío 360.</p>
+                <p>Podrás comprar entradas, recibir confirmaciones por email, consultar tus pedidos y acceder a tus tickets con QR simulado.</p>
+                <p>También tendrás acceso al asistente inteligente, al Muro Blanquinegro y a las funcionalidades privadas de usuario.</p>
+            </div>
+        </article>
+        <article class="auth-form-panel">
+            <div class="auth-title-block">
+                <img th:src="@{/images/burgos-cf-shield.png}" alt="Escudo del Burgos CF">
+                <div>
+                    <span>Alta de usuario</span>
+                    <h2>CREAR CUENTA</h2>
+                </div>
+            </div>
+            <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="auth-form">
+                <div class="grid gap-4 md:grid-cols-2">
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-4.42 0-8 2.24-8 5v1.25c0 .41.34.75.75.75h14.5c.41 0 .75-.34.75-.75V19c0-2.76-3.58-5-8-5Z"/></svg>
+                            Nombre
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{firstName}" placeholder="Ej: Marcos" required>
+                    </label>
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3ZM8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Zm8 0c-.31 0-.66.02-1.03.05 1.16.84 2.03 1.97 2.03 3.45V19h7v-2c0-2.66-5.33-4-8-4Z"/></svg>
+                            Apellidos
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{lastName}" placeholder="Ej: Zamorano Lasso" required>
+                    </label>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/></svg>
+                            Correo electrónico
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{email}" type="email" placeholder="Ej: marcos@gmail.com" required>
+                    </label>
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.11.37 2.31.56 3.58.56a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.27.19 2.47.56 3.58a1 1 0 0 1-.24 1.01l-2.2 2.2Z"/></svg>
+                            Teléfono
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{phone}" type="tel" inputmode="tel" placeholder="+34 999 99 99 99">
+                        <span class="auth-help">Si no indicas prefijo, se aplicará +34 automáticamente.</span>
+                    </label>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1Zm-8 0V7a3 3 0 0 1 6 0v2H9Z"/></svg>
+                            Contraseña
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{password}" type="password" minlength="8" placeholder="Introduce la contraseña" required>
+                    </label>
+                    <label class="auth-field">
+                        <span class="auth-field-label">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm-1 15-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7Z"/></svg>
+                            Repetir contraseña
+                        </span>
+                        <input class="input input-bordered auth-input" th:field="*{confirmPassword}" type="password" minlength="8" placeholder="Repite la contraseña" required>
+                    </label>
+                </div>
+                <p class="auth-help">La contraseña debe tener al menos 8 caracteres. Se recomienda incluir mayúsculas, números y caracteres especiales.</p>
+                <button class="btn btn-primary auth-submit">Registrarse</button>
             </form>
-        </div></div>
-    </div></div>
+            <a class="btn btn-outline btn-primary auth-guest" th:href="@{/}">Continuar como visitante</a>
+            <p class="auth-switch">¿Ya tienes cuenta? <a th:href="@{/login}">Iniciar sesión</a></p>
+        </article>
+    </section>
 </main>
 <div th:replace="~{fragments/common :: scripts}"></div>
 </body>

@@ -8,8 +8,8 @@
 <head th:replace="~{fragments/common :: head('Perfil')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
-<main class="container py-5">
-    <div class="card plantio-card"><div class="card-body p-4">
+<main class="app-shell py-10">
+    <div class="card plantio-card"><div class="card-body p-6">
         <h1>Perfil</h1>
         <p><strong>Nombre:</strong> <span th:text="${user.fullName}"></span></p>
         <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>

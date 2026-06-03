@@ -12,4 +12,11 @@ import lombok.Setter;
 /** Datos de registro de usuario. */
 @Getter
 @Setter
-public class RegisterRequest { private String firstName; private String lastName; private String email; private String password; private String phone; }
+public class RegisterRequest {
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String confirmPassword;
+    private String phone;
+}

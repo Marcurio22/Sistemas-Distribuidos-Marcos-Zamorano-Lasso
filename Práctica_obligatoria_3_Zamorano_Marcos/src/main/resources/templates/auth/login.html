@@ -6,21 +6,54 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/common :: head('Login')}"></head>
-<body class="auth-bg">
+<body class="auth-page">
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
-    <div class="row justify-content-center"><div class="col-md-5">
-        <div class="card plantio-card"><div class="card-body p-4">
-            <h1 class="h3 mb-3">Acceso seguro</h1>
-            <p class="text-muted">JWT stateless en cookie HttpOnly. Demo: admin@plantio360.local / admin1234</p>
-            <form th:action="@{/login}" th:object="${loginRequest}" method="post">
-                <label class="form-label">Email</label><input class="form-control mb-3" th:field="*{email}" type="email" required>
-                <label class="form-label">Contraseña</label><input class="form-control mb-3" th:field="*{password}" type="password" required>
-                <button class="btn btn-primary w-100">Entrar</button>
+<main class="auth-shell">
+    <section class="auth-card-grid">
+        <article class="auth-visual-panel">
+            <div class="auth-visual-copy">
+                <h1>¡BIENVENIDO!</h1>
+                <p>Accede a El Plantío 360 para comprar entradas, consultar tus pedidos, guardar tus tickets y participar en el Muro Blanquinegro.</p>
+                <p>Sin iniciar sesión, puedes explorar jugadores, partidos, tienda y el visor cartográfico público del estadio.</p>
+                <p>Con tu cuenta podrás comprar entradas y productos, recibir confirmaciones por email, consultar tus QR simulados y usar servicios personalizados.</p>
+                <p class="font-black">Para iniciar sesión, introduce tu correo electrónico y tu contraseña.</p>
+            </div>
+        </article>
+        <article class="auth-form-panel">
+            <div class="auth-title-block">
+                <img th:src="@{/images/burgos-cf-shield.png}" alt="Escudo del Burgos CF">
+                <div>
+                    <span>Acceso seguro</span>
+                    <h2>INICIO DE SESIÓN</h2>
+                </div>
+            </div>
+            <div class="auth-demo-box">
+                <span class="block font-black uppercase tracking-wide text-plantio-emerald">Datos de prueba</span>
+                <p><strong>Usuario:</strong> admin@plantio360.local</p>
+                <p><strong>Contraseña:</strong> admin1234</p>
+            </div>
+            <form th:action="@{/login}" th:object="${loginRequest}" method="post" class="auth-form">
+                <label class="auth-field">
+                    <span class="auth-field-label">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-4.42 0-8 2.24-8 5v1.25c0 .41.34.75.75.75h14.5c.41 0 .75-.34.75-.75V19c0-2.76-3.58-5-8-5Z"/></svg>
+                        Correo electrónico
+                    </span>
+                    <input class="input input-bordered auth-input" th:field="*{email}" type="email" placeholder="Ej: admin@plantio360.local" required>
+                </label>
+                <label class="auth-field">
+                    <span class="auth-field-label">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7A5 5 0 0 0 7 7v2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1Zm-8 0V7a3 3 0 0 1 6 0v2H9Z"/></svg>
+                        Contraseña
+                    </span>
+                    <input class="input input-bordered auth-input" th:field="*{password}" type="password" placeholder="Introduce tu contraseña" required>
+                </label>
+                <button class="btn btn-primary auth-submit">Iniciar sesión</button>
             </form>
-        </div></div>
-    </div></div>
+            <a class="btn btn-outline btn-primary auth-guest" th:href="@{/}">Continuar como visitante</a>
+            <p class="auth-switch">¿No tienes cuenta? <a th:href="@{/register}">Registrarse</a></p>
+        </article>
+    </section>
 </main>
 <div th:replace="~{fragments/common :: scripts}"></div>
 </body>

@@ -16,15 +16,22 @@
                 extend: {
                     colors: {
                         plantio: {
-                            navy: '#052b55',
-                            blue: '#0b5ea8',
-                            gold: '#ffc107'
+                            ink: '#0b1110',
+                            charcoal: '#1f2933',
+                            slate: '#4b5563',
+                            green: '#2f8b3f',
+                            emerald: '#246f32',
+                            grass: '#e9f7ec',
+                            fog: '#f4f6f4'
                         }
+                    },
+                    boxShadow: {
+                        plantio: '0 22px 70px rgba(15, 23, 42, .16)'
                     }
                 }
             }
         };
-        document.documentElement.setAttribute('data-theme', 'corporate');
+        document.documentElement.setAttribute('data-theme', 'light');
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css">
@@ -34,7 +41,7 @@
     <link rel="stylesheet" th:href="@{/css/plantio.css}">
 </head>
 <body>
-<nav th:fragment="navbar" class="navbar plantio-navbar sticky-top">
+<nav th:fragment="navbar" class="navbar plantio-navbar sticky top-0 z-50">
     <div class="navbar-start">
         <div class="dropdown lg:hidden">
             <button tabindex="0" type="button" class="btn btn-ghost text-white" aria-label="Abrir menú de navegación">☰</button>
@@ -65,15 +72,15 @@
         </ul>
     </div>
     <div class="navbar-end gap-2">
-        <a sec:authorize="!isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-navy" th:href="@{/login}">Login</a>
-        <a sec:authorize="!isAuthenticated()" class="btn btn-warning btn-sm" th:href="@{/register}">Registro</a>
-        <a sec:authorize="isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-navy" th:href="@{/dashboard}">Dashboard</a>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-ink" th:href="@{/login}">Login</a>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-primary btn-sm" th:href="@{/register}">Registro</a>
+        <a sec:authorize="isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-ink" th:href="@{/dashboard}">Dashboard</a>
         <a sec:authorize="isAuthenticated()" class="btn btn-error btn-sm" th:href="@{/logout}">Logout</a>
     </div>
 </nav>
 
-<footer th:fragment="footer" class="footer mt-5 py-4">
-    <div class="container footer-content">
+<footer th:fragment="footer" class="footer mt-10 py-6">
+    <div class="app-shell footer-content">
         <div>
             <strong>Trabajo del Taller · Sistemas Distribuidos · </strong>
             <a href="https://www.ubu.es/" target="_blank" rel="noopener noreferrer">Universidad de Burgos</a>
@@ -87,9 +94,15 @@
     </div>
 </footer>
 
-<div th:fragment="alerts" class="container mt-3">
-    <div th:if="${success}" class="alert alert-success shadow-lg" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-error shadow-lg" th:text="${error}"></div>
+<div th:fragment="alerts" class="toast toast-top toast-end z-[9999] w-full max-w-md p-4 pointer-events-none">
+    <div th:if="${success}" class="alert alert-success plantio-toast shadow-2xl pointer-events-auto" role="status" data-toast data-auto-dismiss="5000">
+        <span th:text="${success}">Operación completada correctamente.</span>
+        <button type="button" class="btn btn-ghost btn-xs plantio-toast-close" aria-label="Cerrar aviso">✕</button>
+    </div>
+    <div th:if="${error}" class="alert alert-error plantio-toast shadow-2xl pointer-events-auto" role="alert" data-toast data-auto-dismiss="5000">
+        <span th:text="${error}">Se ha producido un error.</span>
+        <button type="button" class="btn btn-ghost btn-xs plantio-toast-close" aria-label="Cerrar aviso">✕</button>
+    </div>
 </div>
 
 <div th:fragment="scripts">

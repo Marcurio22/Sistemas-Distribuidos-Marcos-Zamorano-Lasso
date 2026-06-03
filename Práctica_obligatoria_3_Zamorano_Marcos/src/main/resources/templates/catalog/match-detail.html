@@ -9,23 +9,23 @@
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
-    <div class="row g-4">
-        <div class="col-lg-7"><div class="card plantio-card"><div class="card-body p-4">
-            <span class="badge text-bg-primary" th:text="${match.competition}">Competición</span>
+<main class="app-shell py-10">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div><div class="card plantio-card"><div class="card-body p-6">
+            <span class="badge badge-primary" th:text="${match.competition}">Competición</span>
             <h1 class="mt-3" th:text="'Burgos CF vs ' + ${match.rival}">Partido</h1>
-            <p class="lead" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')} + ' · ' + ${match.stadium}">Fecha</p>
+            <p class="text-lg leading-8 text-slate-700" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')} + ' · ' + ${match.stadium}">Fecha</p>
             <p>Entradas disponibles: <strong th:text="${match.availableTickets}">0</strong></p>
             <p>Precio base: <strong th:text="${match.basePrice} + ' €'">0</strong></p>
         </div></div></div>
-        <div class="col-lg-5"><div class="card plantio-card"><div class="card-body p-4">
-            <h2 class="h4">Pasarela simulada</h2>
+        <div><div class="card plantio-card"><div class="card-body p-6">
+            <h2 class="text-2xl font-black">Pasarela simulada</h2>
             <form th:action="@{/checkout/ticket/{id}(id=${match.id})}" th:object="${checkout}" method="post">
-                <label class="form-label">Zona</label><select class="form-select mb-3" th:field="*{zone}"><option>Lateral</option><option>Fondo Norte</option><option>Tribuna</option><option>Zona joven</option></select>
-                <label class="form-label">Titular</label><input class="form-control mb-3" th:field="*{cardHolder}" required placeholder="Marcos Zamorano">
-                <label class="form-label">Tarjeta ficticia</label><input class="form-control mb-3" th:field="*{cardNumber}" value="4242424242424242" required>
-                <div class="row"><div class="col"><label class="form-label">Caducidad</label><input class="form-control mb-3" th:field="*{expiry}" placeholder="12/30"></div><div class="col"><label class="form-label">CVV</label><input class="form-control mb-3" th:field="*{cvv}" placeholder="123"></div></div>
-                <button class="btn btn-warning w-100">Confirmar compra</button>
+                <label class="field-label">Zona</label><select class="select select-bordered w-full mb-3" th:field="*{zone}"><option>Lateral</option><option>Fondo Norte</option><option>Tribuna</option><option>Zona joven</option></select>
+                <label class="field-label">Titular</label><input class="input input-bordered w-full mb-3" th:field="*{cardHolder}" required placeholder="Marcos Zamorano">
+                <label class="field-label">Tarjeta ficticia</label><input class="input input-bordered w-full mb-3" th:field="*{cardNumber}" value="4242424242424242" required>
+                <div class="grid gap-5 md:grid-cols-2"><div><label class="field-label">Caducidad</label><input class="input input-bordered w-full mb-3" th:field="*{expiry}" placeholder="12/30"></div><div><label class="field-label">CVV</label><input class="input input-bordered w-full mb-3" th:field="*{cvv}" placeholder="123"></div></div>
+                <button class="btn btn-accent w-full">Confirmar compra</button>
             </form>
         </div></div></div>
     </div>

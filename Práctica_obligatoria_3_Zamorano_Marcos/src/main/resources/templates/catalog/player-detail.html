@@ -8,19 +8,19 @@
 <head th:replace="~{fragments/common :: head(${player.name})}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
-<main class="container py-5">
-    <div class="card plantio-card"><div class="card-body p-4">
-        <div class="row align-items-center g-4">
-            <div class="col-md-3 text-center"><img class="avatar-large" th:src="${player.imageUrl}" alt="Jugador"></div>
-            <div class="col-md-9">
+<main class="app-shell py-10">
+    <div class="card plantio-card"><div class="card-body p-6">
+        <div class="grid gap-8 lg:grid-cols-[1.35fr_.95fr] items-center">
+            <div class="text-center"><img class="avatar-large" th:src="${player.imageUrl}" alt="Jugador"></div>
+            <div>
                 <h1 th:text="'#' + ${player.dorsal} + ' ' + ${player.name}">Jugador</h1>
-                <p class="lead" th:text="${player.position} + ' · ' + ${player.nationality}">Datos</p>
+                <p class="text-lg leading-8 text-slate-700" th:text="${player.position} + ' · ' + ${player.nationality}">Datos</p>
                 <p th:text="${player.description}">Descripción</p>
-                <div class="row text-center mt-4">
-                    <div class="col"><strong th:text="${player.age}">0</strong><span>Edad</span></div>
-                    <div class="col"><strong th:text="${player.goals}">0</strong><span>Goles</span></div>
-                    <div class="col"><strong th:text="${player.assists}">0</strong><span>Asistencias</span></div>
-                    <div class="col"><strong th:text="${player.status}">OK</strong><span>Estado</span></div>
+                <div class="grid gap-5 md:grid-cols-2 text-center mt-4">
+                    <div><strong th:text="${player.age}">0</strong><span>Edad</span></div>
+                    <div><strong th:text="${player.goals}">0</strong><span>Goles</span></div>
+                    <div><strong th:text="${player.assists}">0</strong><span>Asistencias</span></div>
+                    <div><strong th:text="${player.status}">OK</strong><span>Estado</span></div>
                 </div>
             </div>
         </div>

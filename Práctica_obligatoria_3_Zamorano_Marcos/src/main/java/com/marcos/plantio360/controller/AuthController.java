@@ -106,6 +106,7 @@ public class AuthController {
             return "redirect:/dashboard";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
+            model.addAttribute("registerRequest", request);
             return "auth/register";
         }
     }

@@ -68,12 +68,33 @@ function sendChatMessage(stompClient, input) {
     input.value = '';
 }
 
+
+/**
+ * Inicializa los mensajes flash como toasts volátiles y no intrusivos.
+ */
+function initFlashToasts() {
+    document.querySelectorAll('[data-toast]').forEach(toast => {
+        const closeButton = toast.querySelector('.plantio-toast-close');
+        let dismissed = false;
+        const dismiss = () => {
+            if (dismissed) return;
+            dismissed = true;
+            toast.classList.add('plantio-toast-leaving');
+            window.setTimeout(() => toast.remove(), 240);
+        };
+        if (closeButton) closeButton.addEventListener('click', dismiss);
+        const delay = Number(toast.dataset.autoDismiss || 5000);
+        if (delay > 0) window.setTimeout(dismiss, delay);
+    });
+}
+
 /**
  * Punto de entrada de utilidades de interfaz.
  */
 document.addEventListener('DOMContentLoaded', () => {
     initPlantioMap();
     initPlantioChat();
+    initFlashToasts();
 });
 
 

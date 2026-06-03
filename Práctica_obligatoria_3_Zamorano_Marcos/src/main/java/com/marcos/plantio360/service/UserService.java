@@ -34,11 +34,47 @@ public class UserService {
     @Transactional
     public AppUser register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new IllegalArgumentException("Email ya registrado");
+        if (request.getPassword() == null || request.getPassword().length() < 8) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+        }
+        if (request.getConfirmPassword() != null && !request.getConfirmPassword().isBlank()
+            && !request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
         AppUser user = AppUser.builder()
             .firstName(request.getFirstName()).lastName(request.getLastName()).email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword())).phone(request.getPhone())
+            .password(passwordEncoder.encode(request.getPassword())).phone(normalizePhone(request.getPhone()))
             .role("ROLE_USER").enabled(true).avatarUrl("/images/avatar.svg").build();
         return userRepository.save(user);
+    }
+
+    /**
+     * Normaliza el teléfono al formato internacional visible del prototipo.
+     *
+     * @param phone teléfono introducido por el usuario.
+     * @return teléfono con prefijo y agrupación legible, o null si no se indicó.
+     */
+    private String normalizePhone(String phone) {
+        if (phone == null || phone.isBlank()) return null;
+        String trimmed = phone.trim().replaceAll("\\s+", " ");
+        String compact = trimmed.replaceAll("[^+0-9]", "");
+        if (compact.startsWith("00")) compact = "+" + compact.substring(2);
+        if (!compact.startsWith("+")) {
+            String digits = compact.replaceAll("\\D", "");
+            if (digits.startsWith("34") && digits.length() == 11) digits = digits.substring(2);
+            compact = "+34" + digits;
+        }
+        String digits = compact.substring(1).replaceAll("\\D", "");
+        if (digits.length() <= 9) return "+34 " + groupLocalNumber(digits);
+        String prefix = digits.substring(0, digits.length() - 9);
+        String local = digits.substring(digits.length() - 9);
+        return "+" + prefix + " " + groupLocalNumber(local);
+    }
+
+    /** Agrupa un número local como 999 99 99 99 cuando tiene nueve cifras. */
+    private String groupLocalNumber(String local) {
+        if (local == null || local.length() != 9) return local;
+        return local.substring(0, 3) + " " + local.substring(3, 5) + " " + local.substring(5, 7) + " " + local.substring(7, 9);
     }
 
     /** Devuelve todos los usuarios. */

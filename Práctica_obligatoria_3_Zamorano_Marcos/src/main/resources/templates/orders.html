@@ -9,10 +9,10 @@
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
-<main class="container py-5">
+<main class="app-shell py-10">
     <h1>Mis pedidos</h1>
-    <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Referencia</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead><tbody>
-        <tr th:each="order : ${orders}"><td th:text="${order.paymentReference}"></td><td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td><td><span class="badge text-bg-success" th:text="${order.status}"></span></td><td th:text="${order.total} + ' €'"></td></tr>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="table table-zebra align-middle"><thead><tr><th>Referencia</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead><tbody>
+        <tr th:each="order : ${orders}"><td th:text="${order.paymentReference}"></td><td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td><td><span class="badge badge-success" th:text="${order.status}"></span></td><td th:text="${order.total} + ' €'"></td></tr>
     </tbody></table></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
