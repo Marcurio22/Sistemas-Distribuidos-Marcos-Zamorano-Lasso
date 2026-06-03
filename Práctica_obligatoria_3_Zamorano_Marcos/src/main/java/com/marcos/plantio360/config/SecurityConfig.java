@@ -9,10 +9,13 @@ package com.marcos.plantio360.config;
 
 import com.marcos.plantio360.security.JwtAuthenticationFilter;
 import com.marcos.plantio360.service.PlantioUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -24,6 +27,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -44,6 +48,32 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (request.getRequestURI().startsWith("/api/")) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Autenticación requerida");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/login?required=true");
+                    }
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado")))
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies(JwtAuthenticationFilter.COOKIE_NAME)
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    SecurityContextHolder.clearContext();
+                    ResponseCookie cookie = ResponseCookie.from(JwtAuthenticationFilter.COOKIE_NAME, "")
+                        .httpOnly(true)
+                        .secure(false)
+                        .sameSite("Lax")
+                        .path("/")
+                        .maxAge(0)
+                        .build();
+                    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                    response.sendRedirect(request.getContextPath() + "/?logout=true");
+                }))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/register", "/logout", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error").permitAll()
                 .requestMatchers("/players/**", "/matches/**", "/shop/**", "/map", "/api/players", "/api/matches", "/api/products", "/api/map-points", "/api/sensors/latest").permitAll()

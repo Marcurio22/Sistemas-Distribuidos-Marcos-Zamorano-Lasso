@@ -40,14 +40,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
         Optional<String> token = resolveToken(request);
         if (token.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String email = jwtService.extractSubject(token.get());
-            if (email != null) {
-                var user = userDetailsService.loadUserByUsername(email);
-                if (jwtService.isTokenValid(token.get(), user.getUsername())) {
-                    var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+            try {
+                String email = jwtService.extractSubject(token.get());
+                if (email != null) {
+                    var user = userDetailsService.loadUserByUsername(email);
+                    if (jwtService.isTokenValid(token.get(), user.getUsername())) {
+                        var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
+            } catch (RuntimeException ex) {
+                SecurityContextHolder.clearContext();
             }
         }
         chain.doFilter(request, response);

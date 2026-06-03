@@ -75,3 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initPlantioMap();
     initPlantioChat();
 });
+
+
+/**
+ * Rellena el textarea del asistente desde una FAQ seleccionada.
+ * Autor: Marcos Zamorano Lasso
+ */
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('.faq-question-button');
+    if (!button) return;
+    const questionInput = document.getElementById('question');
+    if (!questionInput) return;
+    questionInput.value = button.dataset.question || '';
+    questionInput.focus();
+});

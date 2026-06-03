@@ -28,6 +28,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/png" th:href="@{/images/burgos-cf-favicon.png}">
+    <link rel="apple-touch-icon" th:href="@{/images/burgos-cf-shield.png}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" th:href="@{/css/plantio.css}">
 </head>
@@ -46,7 +48,10 @@
                 <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Admin</a></li>
             </ul>
         </div>
-        <a class="btn btn-ghost normal-case text-xl text-white" th:href="@{/}">⚽ El Plantío 360</a>
+        <a class="btn btn-ghost normal-case text-xl text-white plantio-brand" th:href="@{/}" aria-label="Ir a la página principal de El Plantío 360">
+            <img class="plantio-brand-logo" th:src="@{/images/burgos-cf-shield.png}" alt="Escudo del Burgos CF">
+            <span>El Plantío 360</span>
+        </a>
     </div>
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1 text-white">
@@ -68,9 +73,17 @@
 </nav>
 
 <footer th:fragment="footer" class="footer mt-5 py-4">
-    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
-        <span>© 2026 El Plantío 360 · Proyecto académico</span>
-        <span>Spring Boot · JWT · JPA · RabbitMQ · Redis · Flask · Leaflet · Tailwind · DaisyUI</span>
+    <div class="container footer-content">
+        <div>
+            <strong>Trabajo del Taller · Sistemas Distribuidos · </strong>
+            <a href="https://www.ubu.es/" target="_blank" rel="noopener noreferrer">Universidad de Burgos</a>
+        </div>
+        <div>Spring Boot · JWT · JPA · RabbitMQ · Redis · Flask · Leaflet · Tailwind · DaisyUI</div>
+        <small class="footer-disclaimer">
+            Imágenes y marcas del Burgos CF utilizadas únicamente como recurso visual en un prototipo académico,
+            sin ánimo de lucro. Todos los derechos pertenecen a sus titulares y a la web oficial del
+            <a href="https://www.burgoscf.es/" target="_blank" rel="noopener noreferrer">Burgos CF</a>.
+        </small>
     </div>
 </footer>
 

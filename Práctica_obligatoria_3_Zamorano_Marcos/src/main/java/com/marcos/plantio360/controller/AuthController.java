@@ -11,6 +11,7 @@ import com.marcos.plantio360.dto.JwtResponse;
 import com.marcos.plantio360.dto.LoginRequest;
 import com.marcos.plantio360.dto.RegisterRequest;
 import com.marcos.plantio360.model.AppUser;
+import com.marcos.plantio360.security.JwtAuthenticationFilter;
 import com.marcos.plantio360.service.JwtService;
 import com.marcos.plantio360.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,8 +44,16 @@ public class AuthController {
      * @return plantilla de login.
      */
     @GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(@RequestParam(required = false) String required,
+                            @RequestParam(required = false) String logout,
+                            Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
+        if (required != null) {
+            model.addAttribute("error", "Debes iniciar sesión para acceder a esa funcionalidad.");
+        }
+        if (logout != null) {
+            model.addAttribute("success", "Sesión cerrada correctamente.");
+        }
         return "auth/login";
     }
 
@@ -109,7 +118,7 @@ public class AuthController {
      */
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from("PLANTIO360_JWT", "")
+        ResponseCookie cookie = ResponseCookie.from(JwtAuthenticationFilter.COOKIE_NAME, "")
             .httpOnly(true).sameSite("Lax").path("/").maxAge(0).build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return "redirect:/";

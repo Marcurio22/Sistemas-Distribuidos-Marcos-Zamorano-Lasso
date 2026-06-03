@@ -180,3 +180,17 @@ textarea.form-control { min-height: 8rem; }
     .section-title { align-items: flex-start; flex-direction: column; }
     .input-group { flex-direction: column; }
 }
+
+/* Branding oficializado para el prototipo académico. */
+.plantio-brand { display: inline-flex; align-items: center; gap: .55rem; }
+.plantio-brand-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .28));
+}
+.footer a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.footer-content { display: flex; flex-direction: column; gap: .75rem; }
+.footer-disclaimer { display: block; max-width: 980px; line-height: 1.55; opacity: .88; }
+.alert-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+.collapse { border: 1px solid rgba(15, 23, 42, .08); }
