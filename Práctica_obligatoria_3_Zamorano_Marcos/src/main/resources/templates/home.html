@@ -1,0 +1,77 @@
+<!--
+  El Plantío 360 - Página principal.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Inicio')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
+<header class="hero">
+    <div class="container py-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge rounded-pill text-bg-warning mb-3">Plataforma inteligente para aficionados</span>
+                <h1 class="display-4 fw-bold">Vive el partido desde El Plantío 360</h1>
+                <p class="lead">Compra entradas, explora el estadio, consulta sensores simulados, pregunta al asistente IA y participa en el Muro Blanquinegro.</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a class="btn btn-warning btn-lg" th:href="@{/matches}">Comprar entradas</a>
+                    <a class="btn btn-outline-light btn-lg" th:href="@{/map}">Abrir visor cartográfico</a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-card">
+                    <h2 class="h4">Stack distribuido</h2>
+                    <p>Spring Boot, JPA, Thymeleaf, JWT, RabbitMQ, Redis, Flask, WebSockets, MailHog, Docker y SonarQube.</p>
+                    <a class="btn btn-light" th:href="@{/assistant}">Probar Blanquinegro Bot</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="container py-5">
+    <section class="mb-5">
+        <div class="section-title"><h2>Próximos partidos</h2><a th:href="@{/matches}">Ver todos</a></div>
+        <div class="row g-4">
+            <div class="col-md-4" th:each="match : ${matches}">
+                <div class="card plantio-card h-100"><div class="card-body">
+                    <span class="badge text-bg-primary" th:text="${match.competition}">Liga</span>
+                    <h3 class="h5 mt-3" th:text="'Burgos CF vs ' + ${match.rival}">Partido</h3>
+                    <p class="text-muted" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</p>
+                    <p><strong th:text="${match.basePrice} + ' €'"></strong> · <span th:text="${match.availableTickets} + ' disponibles'"></span></p>
+                    <a class="btn btn-outline-primary" th:href="@{/matches/{id}(id=${match.id})}">Comprar</a>
+                </div></div>
+            </div>
+        </div>
+    </section>
+    <section class="mb-5">
+        <div class="section-title"><h2>Jugadores destacados</h2><a th:href="@{/players}">Plantilla</a></div>
+        <div class="row g-4">
+            <div class="col-md-3" th:each="player : ${players}">
+                <div class="card plantio-card h-100 text-center"><div class="card-body">
+                    <img class="avatar mb-3" th:src="${player.imageUrl}" alt="Jugador">
+                    <h3 class="h6" th:text="${player.name}">Jugador</h3>
+                    <p class="text-muted" th:text="'#' + ${player.dorsal} + ' · ' + ${player.position}">Posición</p>
+                </div></div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="section-title"><h2>Tienda</h2><a th:href="@{/shop}">Ver tienda</a></div>
+        <div class="row g-4">
+            <div class="col-md-4" th:each="product : ${products}">
+                <div class="card plantio-card h-100"><div class="card-body">
+                    <h3 class="h5" th:text="${product.name}">Producto</h3>
+                    <p th:text="${product.description}">Descripción</p>
+                    <strong th:text="${product.price} + ' €'"></strong>
+                </div></div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

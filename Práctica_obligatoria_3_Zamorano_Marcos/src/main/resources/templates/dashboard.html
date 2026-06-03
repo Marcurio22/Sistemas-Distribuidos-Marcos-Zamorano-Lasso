@@ -1,0 +1,29 @@
+<!--
+  El Plantío 360 - Dashboard privado.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
+<main class="container py-5">
+    <h1>Hola, <span th:text="${user.firstName}">usuario</span></h1>
+    <p class="lead">Tu zona privada con pedidos, entradas, notificaciones y acceso al asistente.</p>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3"><a class="dashboard-tile" th:href="@{/my-tickets}">🎟️ Mis entradas</a></div>
+        <div class="col-md-3"><a class="dashboard-tile" th:href="@{/orders}">🛒 Mis pedidos</a></div>
+        <div class="col-md-3"><a class="dashboard-tile" th:href="@{/assistant}">🤖 Asistente IA</a></div>
+        <div class="col-md-3"><a class="dashboard-tile" th:href="@{/chat}">💬 Muro</a></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-6"><div class="card plantio-card"><div class="card-body"><h2 class="h4">Últimos pedidos</h2><div th:each="order : ${orders}" class="border-bottom py-2"><strong th:text="${order.paymentReference}"></strong> · <span th:text="${order.total} + ' €'"></span></div><p th:if="${#lists.isEmpty(orders)}" class="text-muted">Sin pedidos todavía.</p></div></div></div>
+        <div class="col-lg-6"><div class="card plantio-card"><div class="card-body"><h2 class="h4">Notificaciones</h2><div th:each="notification : ${notifications}" class="border-bottom py-2"><strong th:text="${notification.title}"></strong><p class="mb-0" th:text="${notification.message}"></p></div><p th:if="${#lists.isEmpty(notifications)}" class="text-muted">Sin notificaciones.</p></div></div></div>
+    </div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

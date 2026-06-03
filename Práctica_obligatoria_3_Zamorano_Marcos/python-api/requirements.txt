@@ -1,0 +1,3 @@
+# El Plantío 360 - Dependencias Flask
+# Autor: Marcos Zamorano Lasso
+Flask==3.0.3

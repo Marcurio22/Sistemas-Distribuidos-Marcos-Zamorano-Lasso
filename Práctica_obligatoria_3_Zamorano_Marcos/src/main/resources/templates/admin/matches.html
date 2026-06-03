@@ -1,0 +1,18 @@
+<!--
+  El Plantío 360 - Administración.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
+<main class="container py-5">
+<div class="section-title"><h1>Partidos</h1><a class="btn btn-primary" th:href="@{/admin/matches/new}">Nuevo</a></div><table class="table table-hover"><thead><tr><th>Rival</th><th>Competición</th><th>Fecha</th><th>Entradas</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.rival}"></td><td th:text="${item.competition}"></td><td th:text="${#temporals.format(item.matchDate, 'dd/MM/yyyy HH:mm')}"></td><td th:text="${item.availableTickets}"></td><td><a class="btn btn-sm btn-outline-primary" th:href="@{/admin/matches/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

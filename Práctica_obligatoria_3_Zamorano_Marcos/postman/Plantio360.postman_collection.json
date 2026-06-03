@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "El Plantío 360",
+    "description": "Colección Postman para la práctica de Marcos Zamorano Lasso.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"email\": \"admin@plantio360.local\",\n  \"password\": \"admin1234\"\n}"},
+        "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]}
+      }
+    },
+    {
+      "name": "Catalog - Players",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/players", "host": ["{{baseUrl}}"], "path": ["api", "players"]}}
+    },
+    {
+      "name": "Catalog - Matches",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/matches", "host": ["{{baseUrl}}"], "path": ["api", "matches"]}}
+    },
+    {
+      "name": "Catalog - Products",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/products", "host": ["{{baseUrl}}"], "path": ["api", "products"]}}
+    },
+    {
+      "name": "Map - Points",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/map-points", "host": ["{{baseUrl}}"], "path": ["api", "map-points"]}}
+    },
+    {
+      "name": "Sensors - Sync Flask",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}],
+        "url": {"raw": "{{baseUrl}}/api/sensors/sync", "host": ["{{baseUrl}}"], "path": ["api", "sensors", "sync"]}
+      }
+    },
+    {
+      "name": "Assistant - Ask",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{jwt}}"}],
+        "body": {"mode": "raw", "raw": "{\n  \"question\": \"¿Dónde puedo aparcar?\"\n}"},
+        "url": {"raw": "{{baseUrl}}/api/assistant", "host": ["{{baseUrl}}"], "path": ["api", "assistant"]}
+      }
+    },
+    {
+      "name": "Checkout - Buy Product",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{jwt}}"}],
+        "body": {"mode": "raw", "raw": "{\n  \"type\": \"PRODUCT\",\n  \"itemId\": 1,\n  \"quantity\": 1,\n  \"cardHolder\": \"Marcos Zamorano\",\n  \"cardNumber\": \"4242424242424242\",\n  \"expiry\": \"12/30\",\n  \"cvv\": \"123\"\n}"},
+        "url": {"raw": "{{baseUrl}}/api/checkout", "host": ["{{baseUrl}}"], "path": ["api", "checkout"]}
+      }
+    },
+    {
+      "name": "Me - Orders",
+      "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}], "url": {"raw": "{{baseUrl}}/api/me/orders", "host": ["{{baseUrl}}"], "path": ["api", "me", "orders"]}}
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "jwt", "value": ""}
+  ]
+}

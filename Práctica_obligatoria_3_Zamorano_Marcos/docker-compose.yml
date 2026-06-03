@@ -1,0 +1,101 @@
+# El Plantío 360 - Docker Compose completo.
+# Autor: Marcos Zamorano Lasso
+# Práctica 3 - Sistemas Distribuidos
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: plantio360
+      MYSQL_USER: plantio
+      MYSQL_PASSWORD: plantio
+      MYSQL_ROOT_PASSWORD: root
+    ports: ["3307:3306"]
+    volumes: [mysql_data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: plantio360-rabbitmq
+    hostname: plantio360-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: plantio
+      RABBITMQ_DEFAULT_PASS: plantio
+      RABBITMQ_NODENAME: rabbit@plantio360-rabbitmq
+    ports: ["5672:5672", "15672:15672"]
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports: ["1025:1025", "8025:8025"]
+
+  python-api:
+    build: ./python-api
+    ports: ["5000:5000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  spring-app:
+    build: .
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      python-api: { condition: service_healthy }
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/plantio360?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Madrid
+      SPRING_DATASOURCE_USERNAME: plantio
+      SPRING_DATASOURCE_PASSWORD: plantio
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: plantio
+      RABBITMQ_PASSWORD: plantio
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      PLANTIO_PYTHON_API_BASE_URL: http://python-api:5000
+      PLANTIO_JWT_SECRET: CambiaEsteSecretoEnProduccionPlantio360MarcosZamoranoLasso
+      PLANTIO_GEMINI_ENABLED: ${PLANTIO_GEMINI_ENABLED:-true}
+      PLANTIO_GEMINI_MODEL: ${PLANTIO_GEMINI_MODEL:-gemini-2.5-flash}
+      PLANTIO_GEMINI_API_KEY: ${PLANTIO_GEMINI_API_KEY:-}
+    ports: ["8080:8080"]
+
+  sonarqube:
+    image: sonarqube:10.6-community
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    ports: ["9000:9000"]
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_extensions:/opt/sonarqube/extensions
+
+volumes:
+  mysql_data:
+  sonar_data:
+  sonar_logs:
+  sonar_extensions:
+  rabbitmq_data:

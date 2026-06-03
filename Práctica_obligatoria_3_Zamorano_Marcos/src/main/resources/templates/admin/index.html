@@ -1,0 +1,32 @@
+<!--
+  El Plantío 360 - Administración.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
+<main class="container py-5">
+<h1>Panel de administración</h1>
+<p class="lead">Mantenimiento completo de usuarios, jugadores, partidos, productos, mapa, sensores, FAQs, pedidos y logs IA.</p>
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><a class="dashboard-tile" th:href="@{/admin/users}">Usuarios <strong th:text="${users}"></strong></a></div>
+    <div class="col-md-3"><a class="dashboard-tile" th:href="@{/admin/players}">Jugadores <strong th:text="${players}"></strong></a></div>
+    <div class="col-md-3"><a class="dashboard-tile" th:href="@{/admin/matches}">Partidos <strong th:text="${matches}"></strong></a></div>
+    <div class="col-md-3"><a class="dashboard-tile" th:href="@{/admin/products}">Productos <strong th:text="${products}"></strong></a></div>
+</div>
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-primary" th:href="@{/admin/map-points}">Puntos mapa</a>
+    <a class="btn btn-outline-primary" th:href="@{/admin/sensors}">Sensores</a>
+    <a class="btn btn-outline-primary" th:href="@{/admin/faqs}">FAQs</a>
+    <a class="btn btn-outline-primary" th:href="@{/admin/orders}">Pedidos</a>
+    <a class="btn btn-outline-primary" th:href="@{/admin/assistant-logs}">Logs IA</a>
+</div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

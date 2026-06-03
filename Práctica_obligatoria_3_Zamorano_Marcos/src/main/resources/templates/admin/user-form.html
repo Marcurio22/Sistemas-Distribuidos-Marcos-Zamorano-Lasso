@@ -1,0 +1,27 @@
+<!--
+  El Plantío 360 - Administración.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
+<main class="container py-5">
+<h1>Usuario</h1><form th:action="@{/admin/users}" th:object="${item}" method="post" class="card plantio-card p-4">
+<input type="hidden" th:field="*{id}">
+<label>Nombre</label><input class="form-control mb-2" th:field="*{firstName}" required>
+<label>Apellidos</label><input class="form-control mb-2" th:field="*{lastName}" required>
+<label>Email</label><input class="form-control mb-2" th:field="*{email}" required>
+<label>Contraseña</label><input class="form-control mb-2" th:field="*{password}" type="password" placeholder="Vacío conserva la actual">
+<label>Rol</label><select class="form-select mb-2" th:field="*{role}"><option>ROLE_USER</option><option>ROLE_ADMIN</option></select>
+<label>Teléfono</label><input class="form-control mb-2" th:field="*{phone}">
+<div class="form-check mb-3"><input class="form-check-input" type="checkbox" th:field="*{enabled}"><label class="form-check-label">Activo</label></div>
+<button class="btn btn-primary">Guardar</button></form>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

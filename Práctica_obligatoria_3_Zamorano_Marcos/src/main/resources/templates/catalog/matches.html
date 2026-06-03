@@ -1,0 +1,28 @@
+<!--
+  El Plantío 360 - Partidos.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Partidos')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="section-title"><h1>Próximos partidos</h1><span class="badge text-bg-warning">Compra simulada</span></div>
+    <div class="row g-4">
+        <div class="col-md-4" th:each="match : ${matches}">
+            <div class="card plantio-card h-100"><div class="card-body">
+                <span class="badge text-bg-primary" th:text="${match.competition}">Competición</span>
+                <h2 class="h4 mt-3" th:text="'Burgos CF vs ' + ${match.rival}">Partido</h2>
+                <p th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</p>
+                <p><strong th:text="${match.basePrice} + ' €'"></strong> · <span th:text="${match.availableTickets} + ' entradas'"></span></p>
+                <a class="btn btn-primary" th:href="@{/matches/{id}(id=${match.id})}">Comprar entrada</a>
+            </div></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

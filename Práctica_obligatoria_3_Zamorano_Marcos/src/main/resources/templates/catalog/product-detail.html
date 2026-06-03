@@ -1,0 +1,35 @@
+<!--
+  El Plantío 360 - Detalle de producto.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(${product.name})}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-7"><div class="card plantio-card"><div class="card-body p-4">
+            <img class="product-img mb-3" th:src="${product.imageUrl}" alt="Producto">
+            <h1 th:text="${product.name}">Producto</h1>
+            <p class="lead" th:text="${product.description}">Descripción</p>
+            <p>Categoría: <strong th:text="${product.category}">Categoría</strong></p>
+            <p>Precio: <strong th:text="${product.price} + ' €'"></strong></p>
+        </div></div></div>
+        <div class="col-lg-5"><div class="card plantio-card"><div class="card-body p-4">
+            <h2 class="h4">Checkout</h2>
+            <form th:action="@{/checkout/product/{id}(id=${product.id})}" th:object="${checkout}" method="post">
+                <label class="form-label">Cantidad</label><input class="form-control mb-3" th:field="*{quantity}" type="number" min="1" value="1">
+                <label class="form-label">Titular</label><input class="form-control mb-3" th:field="*{cardHolder}" required>
+                <label class="form-label">Tarjeta ficticia</label><input class="form-control mb-3" th:field="*{cardNumber}" value="4242424242424242" required>
+                <div class="row"><div class="col"><label class="form-label">Caducidad</label><input class="form-control mb-3" th:field="*{expiry}" placeholder="12/30"></div><div class="col"><label class="form-label">CVV</label><input class="form-control mb-3" th:field="*{cvv}" placeholder="123"></div></div>
+                <button class="btn btn-warning w-100">Pagar pedido</button>
+            </form>
+        </div></div></div>
+    </div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

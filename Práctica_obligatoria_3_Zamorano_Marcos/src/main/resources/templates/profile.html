@@ -1,0 +1,23 @@
+<!--
+  El Plantío 360 - Perfil.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Perfil')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="card plantio-card"><div class="card-body p-4">
+        <h1>Perfil</h1>
+        <p><strong>Nombre:</strong> <span th:text="${user.fullName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <p><strong>Teléfono:</strong> <span th:text="${user.phone}"></span></p>
+        <p><strong>Rol:</strong> <span th:text="${user.role}"></span></p>
+    </div></div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!--
+  El Plantío 360 - Tienda.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Tienda')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="section-title"><h1>Tienda blanquinegra</h1><span class="badge text-bg-success">Stock + pago simulado</span></div>
+    <div class="row g-4">
+        <div class="col-md-4" th:each="product : ${products}">
+            <div class="card plantio-card h-100"><div class="card-body">
+                <img class="product-img mb-3" th:src="${product.imageUrl}" alt="Producto">
+                <h2 class="h5" th:text="${product.name}">Producto</h2>
+                <p th:text="${product.description}">Descripción</p>
+                <p><strong th:text="${product.price} + ' €'"></strong> · Stock <span th:text="${product.stock}"></span></p>
+                <a class="btn btn-primary" th:href="@{/shop/{id}(id=${product.id})}">Comprar</a>
+            </div></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

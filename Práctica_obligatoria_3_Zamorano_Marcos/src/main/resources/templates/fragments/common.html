@@ -1,0 +1,88 @@
+<!--
+  El Plantío 360 - Fragmentos Thymeleaf reutilizables.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · El Plantío 360'">El Plantío 360</title>
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        plantio: {
+                            navy: '#052b55',
+                            blue: '#0b5ea8',
+                            gold: '#ffc107'
+                        }
+                    }
+                }
+            }
+        };
+        document.documentElement.setAttribute('data-theme', 'corporate');
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" th:href="@{/css/plantio.css}">
+</head>
+<body>
+<nav th:fragment="navbar" class="navbar plantio-navbar sticky-top">
+    <div class="navbar-start">
+        <div class="dropdown lg:hidden">
+            <button tabindex="0" type="button" class="btn btn-ghost text-white" aria-label="Abrir menú de navegación">☰</button>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[80] p-2 shadow bg-base-100 rounded-box w-56 text-base-content">
+                <li><a th:href="@{/players}">Jugadores</a></li>
+                <li><a th:href="@{/matches}">Partidos</a></li>
+                <li><a th:href="@{/shop}">Tienda</a></li>
+                <li><a th:href="@{/map}">Mapa</a></li>
+                <li><a th:href="@{/assistant}">IA</a></li>
+                <li><a th:href="@{/chat}">Muro</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Admin</a></li>
+            </ul>
+        </div>
+        <a class="btn btn-ghost normal-case text-xl text-white" th:href="@{/}">⚽ El Plantío 360</a>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1 text-white">
+            <li><a th:href="@{/players}">Jugadores</a></li>
+            <li><a th:href="@{/matches}">Partidos</a></li>
+            <li><a th:href="@{/shop}">Tienda</a></li>
+            <li><a th:href="@{/map}">Mapa</a></li>
+            <li><a th:href="@{/assistant}">IA</a></li>
+            <li><a th:href="@{/chat}">Muro</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Admin</a></li>
+        </ul>
+    </div>
+    <div class="navbar-end gap-2">
+        <a sec:authorize="!isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-navy" th:href="@{/login}">Login</a>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-warning btn-sm" th:href="@{/register}">Registro</a>
+        <a sec:authorize="isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-navy" th:href="@{/dashboard}">Dashboard</a>
+        <a sec:authorize="isAuthenticated()" class="btn btn-error btn-sm" th:href="@{/logout}">Logout</a>
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="footer mt-5 py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
+        <span>© 2026 El Plantío 360 · Proyecto académico</span>
+        <span>Spring Boot · JWT · JPA · RabbitMQ · Redis · Flask · Leaflet · Tailwind · DaisyUI</span>
+    </div>
+</footer>
+
+<div th:fragment="alerts" class="container mt-3">
+    <div th:if="${success}" class="alert alert-success shadow-lg" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error shadow-lg" th:text="${error}"></div>
+</div>
+
+<div th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script th:src="@{/js/plantio.js}"></script>
+</div>
+</body>
+</html>

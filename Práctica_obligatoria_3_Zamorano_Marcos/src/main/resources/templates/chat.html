@@ -1,0 +1,22 @@
+<!--
+  El Plantío 360 - Muro Blanquinegro.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Muro Blanquinegro')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <h1>Muro Blanquinegro</h1>
+    <p class="lead">Chat en tiempo real con WebSockets, SockJS y STOMP.</p>
+    <div id="chatMessages" class="chat-box mb-3">
+        <div th:each="message : ${messages}" class="chat-message"><strong th:text="${message.displayName}"></strong><span th:text="${message.content}"></span></div>
+    </div>
+    <div class="input-group"><input id="chatInput" class="form-control" placeholder="Escribe un mensaje"><button id="sendChat" class="btn btn-primary">Enviar</button></div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

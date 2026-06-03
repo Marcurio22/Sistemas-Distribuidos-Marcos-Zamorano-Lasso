@@ -1,0 +1,11 @@
+# El Plantío 360 - Git ignore.
+# Autor: Marcos Zamorano Lasso
+# Práctica 3 - Sistemas Distribuidos
+target/
+*.log
+.idea/
+.vscode/
+*.iml
+.env
+__pycache__/
+.DS_Store

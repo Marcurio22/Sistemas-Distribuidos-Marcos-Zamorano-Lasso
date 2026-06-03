@@ -1,0 +1,32 @@
+<!--
+  El Plantío 360 - Detalle de jugador.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(${player.name})}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="card plantio-card"><div class="card-body p-4">
+        <div class="row align-items-center g-4">
+            <div class="col-md-3 text-center"><img class="avatar-large" th:src="${player.imageUrl}" alt="Jugador"></div>
+            <div class="col-md-9">
+                <h1 th:text="'#' + ${player.dorsal} + ' ' + ${player.name}">Jugador</h1>
+                <p class="lead" th:text="${player.position} + ' · ' + ${player.nationality}">Datos</p>
+                <p th:text="${player.description}">Descripción</p>
+                <div class="row text-center mt-4">
+                    <div class="col"><strong th:text="${player.age}">0</strong><span>Edad</span></div>
+                    <div class="col"><strong th:text="${player.goals}">0</strong><span>Goles</span></div>
+                    <div class="col"><strong th:text="${player.assists}">0</strong><span>Asistencias</span></div>
+                    <div class="col"><strong th:text="${player.status}">OK</strong><span>Estado</span></div>
+                </div>
+            </div>
+        </div>
+    </div></div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>

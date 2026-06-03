@@ -1,0 +1,27 @@
+<!--
+  El Plantío 360 - Blanquinegro Bot.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Asistente IA')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<main class="container py-5">
+    <div class="row justify-content-center"><div class="col-lg-8">
+        <div class="card plantio-card"><div class="card-body p-4">
+            <h1>🤖 Blanquinegro Bot</h1>
+            <p class="text-muted">FAQ local + Gemini opcional. Todas las preguntas quedan auditadas para el panel admin.</p>
+            <form th:action="@{/assistant}" th:object="${assistantRequest}" method="post">
+                <label class="form-label">Pregunta</label><textarea class="form-control mb-3" th:field="*{question}" rows="4" placeholder="¿Dónde puedo aparcar?"></textarea>
+                <button class="btn btn-primary">Preguntar</button>
+            </form>
+            <div th:if="${response}" class="assistant-response mt-4"><span class="badge text-bg-info" th:text="${response.source}"></span><p class="mt-2 mb-0" th:text="${response.answer}"></p></div>
+        </div></div>
+    </div></div>
+</main>
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: scripts}"></div>
+</body>
+</html>
