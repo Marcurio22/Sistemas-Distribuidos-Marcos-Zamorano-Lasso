@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <div class="section-title"><h1>Productos</h1><a class="btn btn-primary" th:href="@{/admin/products/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Nombre</th><th>Precio</th><th>Stock</th><th>Activo</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.price}"></td><td th:text="${item.stock}"></td><td th:text="${item.active}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/products/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

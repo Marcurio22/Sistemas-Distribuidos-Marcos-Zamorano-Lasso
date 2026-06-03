@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>Partido</h1><form th:action="@{/admin/matches}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Rival</label><input class="input input-bordered w-full mb-2" th:field="*{rival}" required><label>Competición</label><input class="input input-bordered w-full mb-2" th:field="*{competition}"><label>Fecha</label><input class="input input-bordered w-full mb-2" th:field="*{matchDate}" type="datetime-local"><label>Estadio</label><input class="input input-bordered w-full mb-2" th:field="*{stadium}"><label>Precio base</label><input class="input input-bordered w-full mb-2" th:field="*{basePrice}"><label>Entradas</label><input class="input input-bordered w-full mb-2" th:field="*{availableTickets}" type="number"><label>Estado</label><input class="input input-bordered w-full mb-2" th:field="*{status}"><label>Imagen</label><input class="input input-bordered w-full mb-3" th:field="*{imageUrl}"><button class="btn btn-primary">Guardar</button></form>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

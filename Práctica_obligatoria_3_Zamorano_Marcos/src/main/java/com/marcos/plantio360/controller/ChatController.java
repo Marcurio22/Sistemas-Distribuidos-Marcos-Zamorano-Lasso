@@ -38,6 +38,10 @@ public class ChatController {
         List<ChatMessage> messages = chatMessageRepository.findTop50ByOrderByCreatedAtDesc();
         Collections.reverse(messages);
         model.addAttribute("messages", messages);
+        model.addAttribute("chatDisplayName", currentUserService.current()
+            .map(AppUser::getFullName)
+            .filter(name -> !name.isBlank())
+            .orElse("Aficionado Blanquinegro"));
         return "chat";
     }
 
@@ -46,7 +50,7 @@ public class ChatController {
     @SendTo("/topic/chat")
     public ChatMessage send(ChatPayload payload) {
         AppUser user = currentUserService.current().orElse(null);
-        String displayName = user == null ? "Aficionado" : user.getFullName();
+        String displayName = user == null ? sanitizeDisplayName(payload.getDisplayName()) : user.getFullName();
         ChatMessage message = ChatMessage.builder()
             .user(user)
             .displayName(displayName)
@@ -54,5 +58,19 @@ public class ChatController {
             .createdAt(LocalDateTime.now())
             .build();
         return chatMessageRepository.save(message);
+    }
+
+    /**
+     * Limpia el nombre visible recibido desde la página autenticada cuando el contexto STOMP no trae usuario.
+     *
+     * @param displayName nombre visible propuesto por el cliente.
+     * @return nombre seguro para mostrar en el muro.
+     */
+    private String sanitizeDisplayName(String displayName) {
+        if (displayName == null || displayName.isBlank()) {
+            return "Aficionado Blanquinegro";
+        }
+        String cleaned = displayName.replaceAll("[<>]", "").trim();
+        return cleaned.length() > 60 ? cleaned.substring(0, 60) : cleaned;
     }
 }

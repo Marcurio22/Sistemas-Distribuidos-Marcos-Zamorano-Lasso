@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>Sensor</h1><form th:action="@{/admin/sensors}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{name}"><label>Tipo</label><input class="input input-bordered w-full mb-2" th:field="*{type}"><label>Valor</label><input class="input input-bordered w-full mb-2" th:field="*{value}"><label>Unidad</label><input class="input input-bordered w-full mb-2" th:field="*{unit}"><label>Estado</label><input class="input input-bordered w-full mb-2" th:field="*{status}"><label>Latitud</label><input class="input input-bordered w-full mb-2" th:field="*{latitude}"><label>Longitud</label><input class="input input-bordered w-full mb-3" th:field="*{longitude}"><button class="btn btn-primary">Guardar</button></form>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

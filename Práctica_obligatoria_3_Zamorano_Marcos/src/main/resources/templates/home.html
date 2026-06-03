@@ -59,11 +59,11 @@
         </div>
     </section>
     <section>
-        <div class="section-title"><h2>Tienda</h2><a th:href="@{/shop}">Ver tienda</a></div>
+        <div class="section-title"><h2>Tienda</h2><a class="plantio-link-hover" th:href="@{/shop}">Ver tienda</a></div>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div th:each="product : ${products}">
                 <div class="card plantio-card h-full"><div class="card-body">
-                    <h3 class="text-xl font-black" th:text="${product.name}">Producto</h3>
+                    <h3 class="text-xl font-black"><a class="plantio-link-hover" th:href="@{/shop/{id}(id=${product.id})}" th:text="${product.name}">Producto</a></h3>
                     <p th:text="${product.description}">Descripción</p>
                     <strong th:text="${product.price} + ' €'"></strong>
                 </div></div>

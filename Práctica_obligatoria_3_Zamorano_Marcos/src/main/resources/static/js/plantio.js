@@ -44,7 +44,12 @@ function initPlantioChat() {
             const message = JSON.parse(payload.body);
             const row = document.createElement('div');
             row.className = 'chat-message';
-            row.innerHTML = `<strong>${message.displayName}</strong><span>${message.content}</span>`;
+            const author = document.createElement('strong');
+            author.textContent = message.displayName || 'Aficionado Blanquinegro';
+            const content = document.createElement('span');
+            content.textContent = message.content || '';
+            row.appendChild(author);
+            row.appendChild(content);
             box.appendChild(row);
             box.scrollTop = box.scrollHeight;
         });
@@ -64,7 +69,7 @@ function initPlantioChat() {
 function sendChatMessage(stompClient, input) {
     const content = input.value.trim();
     if (!content || !stompClient.connected) return;
-    stompClient.send('/app/chat.send', {}, JSON.stringify({content}));
+    stompClient.send('/app/chat.send', {}, JSON.stringify({content, displayName: window.plantioChatUser || 'Aficionado Blanquinegro'}));
     input.value = '';
 }
 

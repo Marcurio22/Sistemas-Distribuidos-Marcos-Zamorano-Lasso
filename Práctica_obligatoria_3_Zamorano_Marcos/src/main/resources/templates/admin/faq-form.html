@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>FAQ</h1><form th:action="@{/admin/faqs}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Pregunta</label><input class="input input-bordered w-full mb-2" th:field="*{question}"><label>Respuesta</label><textarea class="textarea textarea-bordered w-full mb-2" th:field="*{answer}"></textarea><label>Categoría</label><input class="input input-bordered w-full mb-2" th:field="*{category}"><div class="flex items-center gap-3 mb-3"><input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}"><label class="font-semibold text-slate-700">Activa</label></div><button class="btn btn-primary">Guardar</button></form>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

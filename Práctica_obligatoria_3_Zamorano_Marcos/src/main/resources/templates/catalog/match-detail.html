@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/matches', 'Volver a partidos')}"></div>
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div><div class="card plantio-card"><div class="card-body p-6">
             <span class="badge badge-primary" th:text="${match.competition}">Competición</span>

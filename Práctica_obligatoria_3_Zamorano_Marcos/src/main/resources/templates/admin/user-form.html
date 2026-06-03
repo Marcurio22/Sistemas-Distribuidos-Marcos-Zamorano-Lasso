@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>Usuario</h1><form th:action="@{/admin/users}" th:object="${item}" method="post" class="card plantio-card p-6">
 <input type="hidden" th:field="*{id}">
 <label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{firstName}" required>

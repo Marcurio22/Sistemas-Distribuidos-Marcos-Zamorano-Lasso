@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>Producto</h1><form th:action="@{/admin/products}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{name}" required><label>Descripción</label><textarea class="textarea textarea-bordered w-full mb-2" th:field="*{description}"></textarea><label>Precio</label><input class="input input-bordered w-full mb-2" th:field="*{price}"><label>Stock</label><input class="input input-bordered w-full mb-2" th:field="*{stock}" type="number"><label>Categoría</label><input class="input input-bordered w-full mb-2" th:field="*{category}"><label>Imagen</label><input class="input input-bordered w-full mb-2" th:field="*{imageUrl}"><div class="flex items-center gap-3 mb-3"><input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}"><label class="font-semibold text-slate-700">Activo</label></div><button class="btn btn-primary">Guardar</button></form>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

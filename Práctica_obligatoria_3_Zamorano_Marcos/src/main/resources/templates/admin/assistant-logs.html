@@ -10,6 +10,7 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
 <h1>Logs del asistente</h1><table class="table table-zebra"><thead><tr><th>Usuario</th><th>Pregunta</th><th>Fuente</th><th>Fecha</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.user.email}"></td><td th:text="${item.question}"></td><td th:text="${item.source}"></td><td th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm')}"></td></tr></tbody></table>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

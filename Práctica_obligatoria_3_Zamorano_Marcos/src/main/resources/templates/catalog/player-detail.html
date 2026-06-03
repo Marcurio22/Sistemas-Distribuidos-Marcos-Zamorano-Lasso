@@ -9,6 +9,7 @@
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <main class="app-shell py-10">
+<div th:replace="~{fragments/common :: backLink('/players', 'Volver a jugadores')}"></div>
     <div class="card plantio-card"><div class="card-body p-6">
         <div class="grid gap-8 lg:grid-cols-[1.35fr_.95fr] items-center">
             <div class="text-center"><img class="avatar-large" th:src="${player.imageUrl}" alt="Jugador"></div>

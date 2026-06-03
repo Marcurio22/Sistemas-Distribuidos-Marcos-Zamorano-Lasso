@@ -12,4 +12,7 @@ import lombok.Setter;
 /** Payload de chat WebSocket. */
 @Getter
 @Setter
-public class ChatPayload { private String content; }
+public class ChatPayload {
+    private String content;
+    private String displayName;
+}

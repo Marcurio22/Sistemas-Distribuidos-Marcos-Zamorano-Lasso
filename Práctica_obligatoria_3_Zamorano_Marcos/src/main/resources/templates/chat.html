@@ -17,6 +17,9 @@
     <div class="join w-full"><input id="chatInput" class="input input-bordered w-full" placeholder="Escribe un mensaje"><button id="sendChat" class="btn btn-primary">Enviar</button></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
+<script th:inline="javascript">
+    window.plantioChatUser = /*[[${chatDisplayName}]]*/ 'Aficionado Blanquinegro';
+</script>
 <div th:replace="~{fragments/common :: scripts}"></div>
 </body>
 </html>

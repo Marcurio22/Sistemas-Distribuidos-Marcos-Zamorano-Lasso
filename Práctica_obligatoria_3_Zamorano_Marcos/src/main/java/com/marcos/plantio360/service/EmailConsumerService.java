@@ -30,7 +30,7 @@ public class EmailConsumerService {
     public void onPurchaseCreated(String payload) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("noreply@plantio360.local");
-        message.setTo("profesor@plantio360.local");
+        message.setTo("josemanuel@plantio.360.local");
         message.setSubject("El Plantío 360 - Evento de compra");
         message.setText("Evento procesado asíncronamente desde RabbitMQ:\n\n" + payload + "\n\nRevisa MailHog para comprobar el flujo completo.");
         mailSender.send(message);
