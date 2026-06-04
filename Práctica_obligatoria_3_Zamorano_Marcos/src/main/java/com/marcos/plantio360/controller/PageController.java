@@ -36,7 +36,10 @@ public class PageController {
      */
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("players", catalogService.findPlayers().stream().limit(4).toList());
+        model.addAttribute("players", catalogService.findPlayers().stream()
+            .filter(player -> java.util.List.of("Ander Cantero", "Álex Lizancos", "Curro", "Fer Niño").contains(player.getName()))
+            .sorted(java.util.Comparator.comparingInt(player -> java.util.List.of("Ander Cantero", "Álex Lizancos", "Curro", "Fer Niño").indexOf(player.getName())))
+            .toList());
         model.addAttribute("matches", catalogService.findUpcomingMatches().stream().limit(3).toList());
         model.addAttribute("products", catalogService.findProducts().stream().limit(3).toList());
         return "home";

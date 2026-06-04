@@ -8,24 +8,55 @@
 <head th:replace="~{fragments/common :: head(${player.name})}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/players', 'Volver a jugadores')}"></div>
-    <div class="card plantio-card"><div class="card-body p-6">
-        <div class="grid gap-8 lg:grid-cols-[1.35fr_.95fr] items-center">
-            <div class="text-center"><img class="avatar-large" th:src="${player.imageUrl}" alt="Jugador"></div>
-            <div>
-                <h1 th:text="'#' + ${player.dorsal} + ' ' + ${player.name}">Jugador</h1>
-                <p class="text-lg leading-8 text-slate-700" th:text="${player.position} + ' · ' + ${player.nationality}">Datos</p>
-                <p th:text="${player.description}">Descripción</p>
-                <div class="grid gap-5 md:grid-cols-2 text-center mt-4">
-                    <div><strong th:text="${player.age}">0</strong><span>Edad</span></div>
-                    <div><strong th:text="${player.goals}">0</strong><span>Goles</span></div>
-                    <div><strong th:text="${player.assists}">0</strong><span>Asistencias</span></div>
-                    <div><strong th:text="${player.status}">OK</strong><span>Estado</span></div>
+    <div th:replace="~{fragments/common :: backLink('/players', 'Volver a jugadores')}"></div>
+
+    <article class="player-detail-card">
+        <section class="player-detail-visual">
+            <img th:src="${player.imageUrl}" th:alt="${'Ficha visual de ' + player.name}">
+            <div class="player-detail-number" th:text="${'#' + player.dorsal}">#16</div>
+        </section>
+
+        <section class="player-detail-info">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+                <span class="player-status"
+                      th:classappend="${player.status == 'FENOMENAL'} ? ' status-mvp' : (${player.status == 'LESIONADO'} ? ' status-error' : (${player.status == 'SANCIONADO'} ? ' status-warning' : (${player.status == 'DUDA'} ? ' status-doubt' : (${player.status == 'NO DISPONIBLE'} ? ' status-off' : ' status-ok'))))"
+                      th:text="${player.status}">DISPONIBLE</span>
+                <span class="badge badge-outline font-black" th:text="${player.position}">Centrocampista</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight" th:text="${player.name}">Curro</h1>
+            <p class="mt-2 text-xl text-slate-600 font-semibold" th:text="${player.nationality}">España</p>
+            <p class="mt-5 text-lg leading-8 text-slate-700" th:text="${player.description}">Descripción</p>
+
+            <div class="player-detail-stats mt-8">
+                <div class="player-stat-card">
+                    <span>Dorsal</span>
+                    <strong th:text="${player.dorsal}">16</strong>
+                </div>
+                <div class="player-stat-card">
+                    <span>Edad</span>
+                    <strong th:text="${player.age}">30</strong>
+                </div>
+                <div class="player-stat-card">
+                    <span>Goles</span>
+                    <strong th:text="${player.goals}">18</strong>
+                </div>
+                <div class="player-stat-card">
+                    <span>Asistencias</span>
+                    <strong th:text="${player.assists}">14</strong>
+                </div>
+                <div class="player-stat-card" th:if="${player.height != null}">
+                    <span>Altura</span>
+                    <strong th:text="${player.height + ' m'}">1.74 m</strong>
+                </div>
+                <div class="player-stat-card" th:if="${player.weight != null}">
+                    <span>Peso</span>
+                    <strong th:text="${player.weight + ' kg'}">71 kg</strong>
                 </div>
             </div>
-        </div>
-    </div></div>
+        </section>
+    </article>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

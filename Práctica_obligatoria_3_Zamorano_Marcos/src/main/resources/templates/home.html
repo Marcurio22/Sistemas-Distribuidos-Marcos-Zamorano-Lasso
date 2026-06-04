@@ -33,12 +33,12 @@
 </header>
 <main class="app-shell py-10">
     <section class="mb-10">
-        <div class="section-title"><h2>Próximos partidos</h2><a th:href="@{/matches}">Ver todos</a></div>
+        <div class="section-title"><h2>Próximos partidos</h2><a class="plantio-link-hover" th:href="@{/matches}">Ver todos</a></div>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div th:each="match : ${matches}">
                 <div class="card plantio-card h-full"><div class="card-body">
                     <span class="badge badge-primary" th:text="${match.competition}">Liga</span>
-                    <h3 class="text-xl font-black mt-3" th:text="'Burgos CF vs ' + ${match.rival}">Partido</h3>
+                    <h3 class="text-xl font-black mt-3"><a class="plantio-link-hover" th:href="@{/matches/{id}(id=${match.id})}" th:text="'Burgos CF vs ' + ${match.rival}">Partido</a></h3>
                     <p class="text-slate-500" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</p>
                     <p><strong th:text="${match.basePrice} + ' €'"></strong> · <span th:text="${match.availableTickets} + ' disponibles'"></span></p>
                     <a class="btn btn-outline btn-primary" th:href="@{/matches/{id}(id=${match.id})}">Comprar</a>
@@ -47,14 +47,16 @@
         </div>
     </section>
     <section class="mb-10">
-        <div class="section-title"><h2>Jugadores destacados</h2><a th:href="@{/players}">Plantilla</a></div>
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="section-title"><h2>Jugadores destacados</h2><a class="plantio-link-hover" th:href="@{/players}">Plantilla</a></div>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div th:each="player : ${players}">
-                <div class="card plantio-card h-full text-center"><div class="card-body">
-                    <img class="avatar mb-3" th:src="${player.imageUrl}" alt="Jugador">
-                    <h3 class="text-base font-black" th:text="${player.name}">Jugador</h3>
-                    <p class="text-slate-500" th:text="'#' + ${player.dorsal} + ' · ' + ${player.position}">Posición</p>
-                </div></div>
+                <a th:href="@{/players/{id}(id=${player.id})}" class="card plantio-card h-full text-center block group hover:no-underline focus:no-underline">
+                    <div class="card-body">
+                        <div class="home-player-thumb mb-3"><img class="home-player-thumb-image" th:src="${player.imageUrl}" th:alt="${player.name}"></div>
+                        <h3 class="text-base font-black plantio-link-hover" th:text="${player.name}">Jugador</h3>
+                        <p class="text-slate-500" th:text="'#' + ${player.dorsal} + ' · ' + ${player.position}">Posición</p>
+                    </div>
+                </a>
             </div>
         </div>
     </section>

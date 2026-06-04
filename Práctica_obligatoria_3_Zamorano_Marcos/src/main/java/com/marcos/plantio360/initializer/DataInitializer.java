@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Carga datos iniciales para que el profesor no tenga que configurar nada manualmente.
@@ -56,24 +58,99 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(AppUser.builder().firstName("Aficionado").lastName("Blanquinegro").email("user@plantio360.local").password(passwordEncoder.encode("user1234")).role("ROLE_USER").phone("611111111").enabled(true).avatarUrl("/images/avatar.svg").build());
     }
 
-    /** Crea jugadores ficticios. */
+    /** Crea o actualiza la plantilla oficial usada como base visual del prototipo. */
     private void seedPlayers() {
-        if (playerRepository.count() > 0) return;
-        playerRepository.saveAll(List.of(
-            player("Álex Sancristóbal", 1, "Portero", "España", 27, "Guardameta seguro bajo palos y líder defensivo."),
-            player("Diego Burgalés", 4, "Defensa", "España", 25, "Central contundente, fuerte por arriba y fiable en salida."),
-            player("Hugo Arlanzón", 8, "Mediocentro", "España", 24, "Organizador con buena lectura del juego y balón parado."),
-            player("Mateo Plantío", 10, "Mediapunta", "Argentina", 23, "Jugador creativo, vertical y determinante entre líneas."),
-            player("Iker Gamonal", 9, "Delantero", "España", 26, "Referencia ofensiva con buen remate y presión alta."),
-            player("Lucas Catedral", 11, "Extremo", "España", 22, "Extremo rápido para atacar espacios y asistir desde banda.")
-        ));
+        List<Player> officialPlayers = List.of(
+            player("Jesús Ruiz", 1, "Portero", "España", 29, 1.85, null, "DISPONIBLE", 0, 0, "Guardameta sobrio para completar la portería blanquinegra con seguridad bajo palos.", "/images/players/jesus-ruiz.png"),
+            player("Álex Lizancos", 2, "Defensa", "España", 22, 1.86, null, "DISPONIBLE", 1, 4, "Lateral joven, intenso y con recorrido para sumar profundidad por la banda.", "/images/players/alex-lizancos.png"),
+            player("Oier Luengo", 3, "Defensa", "España", 28, 1.85, null, "CEDIDO", 0, 0, "Central competitivo, contundente en duelos y útil para reforzar la zaga.", "/images/players/oier-luengo.png"),
+            player("Pablo Galdames", 4, "Centrocampista", "Chile", 29, null, null, "DISPONIBLE", 1, 2, "Mediocentro chileno de trabajo, equilibrio y buena lectura táctica.", "/images/players/pablo-galdames.png"),
+            player("Atienza", 5, "Centrocampista", "España", 27, 1.86, 77, "SANCIONADO", 2, 1, "Pivote de jerarquía para ordenar al equipo y ganar disputas en la medular.", "/images/players/atienza.png"),
+            player("Sergio González", 6, "Defensa", "España", 29, 1.84, null, "DISPONIBLE", 0, 1, "Defensa fiable, ambidiestro y con experiencia para sostener el bloque.", "/images/players/sergio-gonzalez.png"),
+            player("Mateo Mejía", 7, "Delantero", "España", 23, 1.81, null, "DISPONIBLE", 3, 1, "Atacante rápido para romper líneas, atacar espacios y presionar arriba.", "/images/players/mateo-mejia.png"),
+            player("Grego Sierra", 8, "Defensa", "España", 33, 1.86, 74, "LESIONADO", 2, 1, "Defensor zurdo con carácter, experiencia y dominio del juego aéreo.", "/images/players/grego-sierra.png"),
+            player("Fer Niño", 9, "Delantero", "España", 25, 1.91, 78, "DISPONIBLE", 7, 2, "Delantero centro de referencia, poderoso en el área y dominante por arriba.", "/images/players/fer-nino.png"),
+            player("Appin", 10, "Centrocampista", "Francia", 28, 1.77, 71, "DISPONIBLE", 4, 2, "Centrocampista físico y vertical para acelerar transiciones y recuperar balones.", "/images/players/appin.png"),
+            player("Víctor Mollejo", 11, "Delantero", "España", 25, 1.77, null, "DUDA", 1, 3, "Atacante eléctrico, intenso y muy útil entre líneas y en banda.", "/images/players/victor-mollejo.png"),
+            player("Florian Miguel", 12, "Defensa", "Francia", 29, 1.79, null, "DISPONIBLE", 2, 3, "Lateral zurdo polivalente, profundo y sólido en fase defensiva.", "/images/players/florian-miguel.png"),
+            player("Ander Cantero", 13, "Portero", "España", 31, null, null, "DISPONIBLE", 0, 0, "Portero experimentado, líder desde atrás y especialista en mantener la portería a cero.", "/images/players/ander-cantero.jpg"),
+            player("David González", 14, "Centrocampista", "España", 23, 1.80, null, "DISPONIBLE", 12, 6, "Talento burgalés, llegada, balón parado y mucha calidad para decidir partidos.", "/images/players/david-gonzalez.png"),
+            player("Aitor Buñuel", 15, "Defensa", "España", 28, 1.70, null, "DUDA", 0, 1, "Lateral derecho intenso, disciplinado y con recorrido para doblar por fuera.", "/images/players/aitor-bunuel.png"),
+            player("Curro", 16, "Centrocampista", "España", 30, 1.74, 71, "FENOMENAL", 18, 14, "Fenomenal en todo: el mejor del equipo, líder técnico, zurda diferencial, visión de juego y máximo impacto ofensivo.", "/images/players/curro-sanchez.png"),
+            player("Mario Cantero", 17, "Centrocampista", "España", 24, null, null, "DISPONIBLE", 1, 2, "Centrocampista joven, dinámico y con margen para crecer en el primer equipo.", "/images/players/mario-cantero.png"),
+            player("Mario González", 20, "Delantero", "España", 30, 1.84, null, "DISPONIBLE", 4, 1, "Delantero burgalés con movilidad, experiencia y olfato para atacar el área.", "/images/players/mario-gonzalez.png"),
+            player("Iñigo Córdoba", 21, "Delantero", "España", 29, 1.77, null, "DISPONIBLE", 2, 4, "Atacante zurdo con buen regate, último pase y capacidad para romper por banda.", "/images/players/inigo-cordoba.png"),
+            player("Brais Martínez", 22, "Defensa", "España", 24, 1.75, null, "NO DISPONIBLE", 0, 0, "Defensa zurdo de proyección, actualmente marcado como no disponible para mostrar el estado en la interfaz.", "/images/players/brais-martinez.png"),
+            player("Iván Morante", 23, "Centrocampista", "España", 25, null, null, "DISPONIBLE", 2, 4, "Mediocentro de control, precisión en el pase y capacidad para gobernar el ritmo.", "/images/players/ivan-morante.png"),
+            player("Saúl del Cerro", 28, "Centrocampista", "España", 22, null, null, "DISPONIBLE", 0, 1, "Canterano burgalés, trabajador y competitivo para aportar energía a la medular.", "/images/players/saul-del-cerro.png"),
+            player("Hugo Cuenca", 30, "Delantero", "Paraguay", 21, null, null, "DISPONIBLE", 2, 2, "Delantero paraguayo joven, zurdo y con margen para aportar desequilibrio ofensivo.", "/images/players/hugo-cuenca.png"),
+            player("Marcelo Expósito", 33, "Centrocampista", "España", 23, 1.81, null, "DISPONIBLE", 0, 1, "Centrocampista con buen manejo y presencia para sumar alternativas en la rotación.", "/images/players/marcelo-exposito.png")
+        );
+
+        Set<String> officialNames = officialPlayers.stream().map(Player::getName).collect(Collectors.toSet());
+        playerRepository.findAll().stream()
+            .filter(existing -> !officialNames.contains(existing.getName()))
+            .forEach(playerRepository::delete);
+        officialPlayers.forEach(this::upsertPlayer);
     }
 
-    /** Crea una entidad jugador reutilizable. */
-    private Player player(String name, int dorsal, String position, String nationality, int age, String description) {
-        return Player.builder().name(name).dorsal(dorsal).position(position).nationality(nationality).age(age)
-            .height(BigDecimal.valueOf(1.82)).weight(BigDecimal.valueOf(76)).imageUrl("/images/player.svg")
-            .description(description).status("DISPONIBLE").goals(dorsal % 5).assists(dorsal % 3).build();
+    /**
+     * Crea una entidad jugador reutilizable.
+     *
+     * @param name nombre deportivo.
+     * @param dorsal dorsal del jugador.
+     * @param position posición principal.
+     * @param nationality nacionalidad.
+     * @param age edad deportiva de referencia.
+     * @param heightMeters altura en metros, si está disponible.
+     * @param weightKg peso en kilogramos, si está disponible.
+     * @param status estado mostrado en el frontend.
+     * @param goals goles simulados o adaptados para el prototipo.
+     * @param assists asistencias simuladas o adaptadas para el prototipo.
+     * @param description descripción visual para la ficha.
+     * @param imageUrl imagen o tarjeta visual del jugador.
+     * @return jugador preparado para persistencia.
+     */
+    private Player player(String name, int dorsal, String position, String nationality, int age, Double heightMeters, Integer weightKg, String status, int goals, int assists, String description, String imageUrl) {
+        return Player.builder()
+            .name(name)
+            .dorsal(dorsal)
+            .position(position)
+            .nationality(nationality)
+            .age(age)
+            .height(heightMeters == null ? null : BigDecimal.valueOf(heightMeters))
+            .weight(weightKg == null ? null : BigDecimal.valueOf(weightKg))
+            .imageUrl(imageUrl)
+            .description(description)
+            .status(status)
+            .goals(goals)
+            .assists(assists)
+            .build();
+    }
+
+    /**
+     * Crea o actualiza un jugador por nombre o dorsal para sustituir datos ficticios previos.
+     *
+     * @param seed jugador con los datos actualizados.
+     */
+    private void upsertPlayer(Player seed) {
+        Player player = playerRepository.findAll().stream()
+            .filter(existing -> existing.getName().equals(seed.getName()) || existing.getDorsal().equals(seed.getDorsal()))
+            .findFirst()
+            .orElseGet(Player::new);
+        player.setName(seed.getName());
+        player.setDorsal(seed.getDorsal());
+        player.setPosition(seed.getPosition());
+        player.setNationality(seed.getNationality());
+        player.setAge(seed.getAge());
+        player.setHeight(seed.getHeight());
+        player.setWeight(seed.getWeight());
+        player.setImageUrl(seed.getImageUrl());
+        player.setDescription(seed.getDescription());
+        player.setStatus(seed.getStatus());
+        player.setGoals(seed.getGoals());
+        player.setAssists(seed.getAssists());
+        playerRepository.save(player);
     }
 
     /** Crea partidos iniciales. */
