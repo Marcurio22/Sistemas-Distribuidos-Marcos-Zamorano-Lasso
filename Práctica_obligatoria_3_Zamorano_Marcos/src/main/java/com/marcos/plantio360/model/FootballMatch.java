@@ -46,13 +46,27 @@ public class FootballMatch implements Serializable {
     private String status;
     @Column(length = 600)
     private String imageUrl;
+    @Column
+    private Boolean homeGame;
 
     /**
-     * Inicializa estado y disponibilidad.
+     * Inicializa estado, disponibilidad, localía y escudo rival.
      */
     @PrePersist
     public void prePersist() {
-        if (status == null) status = "SCHEDULED";
+        if (status == null) status = "PROGRAMADO";
         if (availableTickets == null) availableTickets = 0;
+        if (homeGame == null) homeGame = true;
+        if (imageUrl == null || imageUrl.isBlank()) imageUrl = "/images/team-default-shield.svg";
+    }
+
+    /**
+     * Normaliza campos esenciales antes de actualizar un partido.
+     */
+    @PreUpdate
+    public void preUpdate() {
+        if (homeGame == null) homeGame = true;
+        if (imageUrl == null || imageUrl.isBlank()) imageUrl = "/images/team-default-shield.svg";
+        if (status == null || status.isBlank()) status = "PROGRAMADO";
     }
 }

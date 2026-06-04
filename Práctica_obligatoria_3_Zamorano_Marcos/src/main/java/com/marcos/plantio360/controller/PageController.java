@@ -131,9 +131,14 @@ public class PageController {
     /** Ejecuta compra de entrada. */
     @PostMapping("/checkout/ticket/{matchId}")
     public String buyTicket(@PathVariable Long matchId, @ModelAttribute CheckoutRequest request, RedirectAttributes redirectAttributes) {
-        purchaseService.buyTicket(currentUserService.require(), matchId, request.getZone());
-        redirectAttributes.addFlashAttribute("success", "Entrada comprada correctamente. Revisa tus entradas y MailHog.");
-        return "redirect:/my-tickets";
+        try {
+            purchaseService.buyTicket(currentUserService.require(), matchId, request.getZone());
+            redirectAttributes.addFlashAttribute("success", "Entrada comprada correctamente. Revisa tus entradas y MailHog.");
+            return "redirect:/my-tickets";
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo completar la compra de la entrada: " + exception.getMessage());
+            return "redirect:/matches/" + matchId;
+        }
     }
 
     /** Ejecuta compra de producto y devuelve errores controlados si no hay stock suficiente. */

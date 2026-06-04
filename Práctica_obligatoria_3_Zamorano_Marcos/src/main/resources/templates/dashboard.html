@@ -1,27 +1,113 @@
 <!--
-  El Plantío 360 - Dashboard privado.
+  El Plantío 360 - Área privada del usuario.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Dashboard')}"></head>
+<head th:replace="~{fragments/common :: head('Mi espacio')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-    <h1>Hola, <span th:text="${user.firstName}">usuario</span></h1>
-    <p class="text-lg leading-8 text-slate-700">Tu zona privada con pedidos, entradas, notificaciones y acceso al asistente.</p>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div><a class="dashboard-tile" th:href="@{/my-tickets}">🎟️ Mis entradas</a></div>
-        <div><a class="dashboard-tile" th:href="@{/orders}">🛒 Mis pedidos</a></div>
-        <div><a class="dashboard-tile" th:href="@{/assistant}">🤖 Asistente IA</a></div>
-        <div><a class="dashboard-tile" th:href="@{/chat}">💬 Muro</a></div>
-    </div>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div><div class="card plantio-card"><div class="card-body"><h2 class="text-2xl font-black">Últimos pedidos</h2><div th:each="order : ${orders}" class="border-b border-slate-200 py-2"><strong th:text="${order.paymentReference}"></strong> · <span th:text="${order.total} + ' €'"></span></div><p th:if="${#lists.isEmpty(orders)}" class="text-slate-500">Sin pedidos todavía.</p></div></div></div>
-        <div><div class="card plantio-card"><div class="card-body"><h2 class="text-2xl font-black">Notificaciones</h2><div th:each="notification : ${notifications}" class="border-b border-slate-200 py-2"><strong th:text="${notification.title}"></strong><p class="mb-0" th:text="${notification.message}"></p></div><p th:if="${#lists.isEmpty(notifications)}" class="text-slate-500">Sin notificaciones.</p></div></div></div>
-    </div>
+    <section class="dashboard-hero mb-8">
+        <div>
+            <p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Área privada</p>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight">Hola, <span th:text="${user.firstName}">usuario</span></h1>
+            <p class="mt-3 text-lg leading-8 text-slate-700 max-w-3xl">Tu zona privada para consultar entradas, revisar pedidos, acceder al asistente y participar en el Muro Blanquinegro.</p>
+        </div>
+    </section>
+
+    <section class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <a class="dashboard-tile pro-card" th:href="@{/my-tickets}">
+            <div class="dashboard-tile-head">
+                <span class="dashboard-icon bg-amber-100 text-amber-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M3 9h18v6H3z"/><path d="M8 9v6"/></svg>
+                </span>
+                <span class="dashboard-arrow">→</span>
+            </div>
+            <h2>Mis entradas</h2>
+            <p>Consulta tickets comprados y revisa sus datos de acceso.</p>
+        </a>
+        <a class="dashboard-tile pro-card" th:href="@{/orders}">
+            <div class="dashboard-tile-head">
+                <span class="dashboard-icon bg-slate-100 text-slate-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                </span>
+                <span class="dashboard-arrow">→</span>
+            </div>
+            <h2>Mis pedidos</h2>
+            <p>Haz seguimiento de compras, referencias y estados de pago.</p>
+        </a>
+        <a class="dashboard-tile pro-card" th:href="@{/assistant}">
+            <div class="dashboard-tile-head">
+                <span class="dashboard-icon bg-emerald-100 text-emerald-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="8" width="10" height="8" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9 16v2a3 3 0 0 0 6 0v-2"/><path d="M3 10h4M17 10h4"/><path d="M5 5l2.5 2.5M19 5l-2.5 2.5"/><circle cx="10" cy="12" r=".5" fill="currentColor"/><circle cx="14" cy="12" r=".5" fill="currentColor"/></svg>
+                </span>
+                <span class="dashboard-arrow">→</span>
+            </div>
+            <h2>Asistente IA</h2>
+            <p>Resuelve dudas sobre la app, partidos, tienda o servicios del estadio.</p>
+        </a>
+        <a class="dashboard-tile pro-card" th:href="@{/chat}">
+            <div class="dashboard-tile-head">
+                <span class="dashboard-icon bg-blue-100 text-blue-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+                </span>
+                <span class="dashboard-arrow">→</span>
+            </div>
+            <h2>Muro</h2>
+            <p>Entra al chat en tiempo real y comenta la actualidad blanquinegra.</p>
+        </a>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+        <div class="card plantio-card pro-card">
+            <div class="card-body">
+                <div class="section-card-heading">
+                    <div>
+                        <p class="section-kicker">Actividad</p>
+                        <h2 class="text-3xl font-black">Últimos pedidos</h2>
+                    </div>
+                    <span class="dashboard-icon bg-slate-100 text-slate-700">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+                    </span>
+                </div>
+                <div th:if="${#lists.isEmpty(orders)}" class="empty-state">
+                    <p class="text-slate-500">Aún no tienes pedidos registrados.</p>
+                </div>
+                <div th:each="order : ${orders}" class="pro-list-row">
+                    <div>
+                        <strong th:text="${order.paymentReference}">PAY-000000</strong>
+                        <p class="text-slate-500 mb-0">Pedido confirmado correctamente.</p>
+                    </div>
+                    <span class="font-black text-plantio-green" th:text="${order.total} + ' €'">19.90 €</span>
+                </div>
+            </div>
+        </div>
+        <div class="card plantio-card pro-card">
+            <div class="card-body">
+                <div class="section-card-heading">
+                    <div>
+                        <p class="section-kicker">Centro de avisos</p>
+                        <h2 class="text-3xl font-black">Notificaciones</h2>
+                    </div>
+                    <span class="dashboard-icon bg-amber-100 text-amber-600">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+                    </span>
+                </div>
+                <div th:if="${#lists.isEmpty(notifications)}" class="empty-state">
+                    <p class="text-slate-500">No hay notificaciones nuevas.</p>
+                </div>
+                <div th:each="notification : ${notifications}" class="pro-list-row items-start">
+                    <div>
+                        <strong th:text="${notification.title}">Notificación</strong>
+                        <p class="mb-0 mt-1 text-slate-700" th:text="${notification.message}">Mensaje</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

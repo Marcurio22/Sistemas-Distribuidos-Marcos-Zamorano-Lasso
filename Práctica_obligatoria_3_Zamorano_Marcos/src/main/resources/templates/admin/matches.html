@@ -1,17 +1,43 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Administración de partidos.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Partidos')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<div class="section-title"><h1>Partidos</h1><a class="btn btn-primary" th:href="@{/admin/matches/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Rival</th><th>Competición</th><th>Fecha</th><th>Entradas</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.rival}"></td><td th:text="${item.competition}"></td><td th:text="${#temporals.format(item.matchDate, 'dd/MM/yyyy HH:mm')}"></td><td th:text="${item.availableTickets}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/matches/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+    <div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
+    <div class="section-title">
+        <div>
+            <p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Administración</p>
+            <h1 class="text-4xl font-black tracking-tight">Partidos</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/admin/matches/new}">Nuevo</a>
+    </div>
+    <div class="overflow-x-auto rounded-3xl bg-white/90 shadow-xl border border-slate-200">
+        <table class="table table-zebra">
+            <thead><tr><th>Partido</th><th>Competición</th><th>Fecha</th><th>Localía</th><th>Entradas</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td>
+                    <div class="flex items-center gap-3">
+                        <img class="w-10 h-10 object-contain rounded-full bg-slate-100 p-1" th:src="${item.imageUrl ?: '/images/team-default-shield.svg'}" th:alt="${item.rival}">
+                        <strong th:text="${item.rival}">Rival</strong>
+                    </div>
+                </td>
+                <td th:text="${item.competition}">Competición</td>
+                <td th:text="${#temporals.format(item.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                <td><span class="badge badge-outline" th:text="${(item.homeGame == null or item.homeGame) ? 'Burgos local' : 'Burgos visitante'}">Localía</span></td>
+                <td th:text="${item.availableTickets}">0</td>
+                <td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/matches/{id}/edit(id=${item.id})}">Editar</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

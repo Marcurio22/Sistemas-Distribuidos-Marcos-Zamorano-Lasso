@@ -75,7 +75,7 @@ public class SecurityConfig {
                     response.sendRedirect(request.getContextPath() + "/?logout=true");
                 }))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/logout", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error").permitAll()
+                .requestMatchers("/", "/login", "/register", "/logout", "/css/**", "/js/**", "/images/**", "/uploads/**", "/actuator/health", "/error").permitAll()
                 .requestMatchers("/players/**", "/matches/**", "/shop/**", "/map", "/api/players", "/api/matches", "/api/products", "/api/map-points", "/api/sensors/latest").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")

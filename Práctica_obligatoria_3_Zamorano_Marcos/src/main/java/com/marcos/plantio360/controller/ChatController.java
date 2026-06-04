@@ -15,9 +15,13 @@ import com.marcos.plantio360.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -43,6 +47,22 @@ public class ChatController {
             .filter(name -> !name.isBlank())
             .orElse("Aficionado Blanquinegro"));
         return "chat";
+    }
+
+
+    /**
+     * Elimina un mensaje del muro desde administración.
+     *
+     * @param id identificador del mensaje.
+     * @param redirectAttributes atributos flash.
+     * @return redirección al muro.
+     */
+    @PostMapping("/chat/{id}/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String deleteMessage(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        chatMessageRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("success", "Mensaje eliminado del Muro Blanquinegro.");
+        return "redirect:/chat";
     }
 
     /** Recibe mensaje STOMP y lo retransmite al canal público. */

@@ -73,7 +73,7 @@ public class DataInitializer implements CommandLineRunner {
             player("Appin", 10, "Centrocampista", "Francia", 28, 1.77, 71, "DISPONIBLE", 4, 2, "Centrocampista físico y vertical para acelerar transiciones y recuperar balones.", "/images/players/appin.png"),
             player("Víctor Mollejo", 11, "Delantero", "España", 25, 1.77, null, "DUDA", 1, 3, "Atacante eléctrico, intenso y muy útil entre líneas y en banda.", "/images/players/victor-mollejo.png"),
             player("Florian Miguel", 12, "Defensa", "Francia", 29, 1.79, null, "DISPONIBLE", 2, 3, "Lateral zurdo polivalente, profundo y sólido en fase defensiva.", "/images/players/florian-miguel.png"),
-            player("Ander Cantero", 13, "Portero", "España", 31, null, null, "DISPONIBLE", 0, 0, "Portero experimentado, líder desde atrás y especialista en mantener la portería a cero.", "/images/players/ander-cantero.jpg"),
+            player("Ander Cantero", 13, "Portero", "España", 31, null, null, "DISPONIBLE", 0, 0, "Portero experimentado, líder desde atrás y especialista en mantener la portería a cero.", "/images/players/ander-cantero.png"),
             player("David González", 14, "Centrocampista", "España", 23, 1.80, null, "DISPONIBLE", 12, 6, "Talento burgalés, llegada, balón parado y mucha calidad para decidir partidos.", "/images/players/david-gonzalez.png"),
             player("Aitor Buñuel", 15, "Defensa", "España", 28, 1.70, null, "DUDA", 0, 1, "Lateral derecho intenso, disciplinado y con recorrido para doblar por fuera.", "/images/players/aitor-bunuel.png"),
             player("Curro", 16, "Centrocampista", "España", 30, 1.74, 71, "FENOMENAL", 18, 14, "Fenomenal en todo: el mejor del equipo, líder técnico, zurda diferencial, visión de juego y máximo impacto ofensivo.", "/images/players/curro-sanchez.png"),
@@ -153,20 +153,43 @@ public class DataInitializer implements CommandLineRunner {
         playerRepository.save(player);
     }
 
-    /** Crea partidos iniciales. */
+    /** Crea o actualiza partidos iniciales de forma idempotente y siempre futuros. */
     private void seedMatches() {
-        if (matchRepository.count() > 0) return;
-        matchRepository.saveAll(List.of(
-            match("Real Oviedo", "LaLiga Hypermotion", 7, BigDecimal.valueOf(22), 7300),
-            match("Racing de Santander", "LaLiga Hypermotion", 15, BigDecimal.valueOf(28), 6200),
-            match("Real Zaragoza", "Copa del Rey", 28, BigDecimal.valueOf(18), 8100)
-        ));
+        upsertMatch("Real Oviedo", "LaLiga Hypermotion", 7, BigDecimal.valueOf(22), 7300, false, "/images/team-default-shield.svg");
+        upsertMatch("Racing de Santander", "LaLiga Hypermotion", 15, BigDecimal.valueOf(28), 6200, true, "/images/team-default-shield.svg");
+        upsertMatch("Real Zaragoza", "Copa del Rey", 28, BigDecimal.valueOf(18), 8100, true, "/images/team-default-shield.svg");
     }
 
-    /** Crea un partido reutilizable. */
-    private FootballMatch match(String rival, String competition, int days, BigDecimal price, int tickets) {
-        return FootballMatch.builder().rival(rival).competition(competition).matchDate(LocalDateTime.now().plusDays(days))
-            .stadium("El Plantío").basePrice(price).availableTickets(tickets).status("PROGRAMADO").imageUrl("/images/stadium.svg").build();
+    /**
+     * Crea o actualiza un partido para evitar datos antiguos tras reiniciar Docker.
+     *
+     * @param rival equipo rival.
+     * @param competition competición oficial simulada.
+     * @param days días desde el arranque.
+     * @param price precio base.
+     * @param tickets entradas iniciales.
+     * @param homeGame indica si el Burgos CF juega como local.
+     * @param imageUrl escudo del rival o placeholder.
+     */
+    private void upsertMatch(String rival, String competition, int days, BigDecimal price, int tickets, boolean homeGame, String imageUrl) {
+        FootballMatch match = matchRepository.findAll().stream()
+            .filter(existing -> existing.getRival().equalsIgnoreCase(rival))
+            .findFirst()
+            .orElseGet(FootballMatch::new);
+        match.setRival(rival);
+        match.setCompetition(competition);
+        match.setMatchDate(LocalDateTime.now().plusDays(days));
+        match.setStadium(homeGame ? "El Plantío" : "Estadio rival");
+        match.setBasePrice(price);
+        if (match.getAvailableTickets() == null || match.getAvailableTickets() <= 0) {
+            match.setAvailableTickets(tickets);
+        }
+        match.setStatus("PROGRAMADO");
+        match.setHomeGame(homeGame);
+        if (match.getImageUrl() == null || match.getImageUrl().isBlank() || match.getImageUrl().equals("/images/stadium.svg")) {
+            match.setImageUrl(imageUrl);
+        }
+        matchRepository.save(match);
     }
 
     /** Crea o actualiza productos de tienda de forma idempotente. */
@@ -243,7 +266,7 @@ public class DataInitializer implements CommandLineRunner {
     private void seedFaqs() {
         upsertFaq("¿Cómo compro una entrada?", "Entra en Partidos, abre el próximo encuentro, elige zona y confirma la pasarela simulada.", "Entradas");
         upsertFaq("¿Dónde puedo aparcar?", "El visor cartográfico muestra parkings cercanos y su ocupación simulada mediante sensores.", "Mapa");
-        upsertFaq("¿Cómo veo mis pedidos?", "Tras iniciar sesión, abre Dashboard o Mis pedidos para consultar compras y referencias de pago.", "Usuario");
+        upsertFaq("¿Cómo veo mis pedidos?", "Tras iniciar sesión, abre Mi espacio o Mis pedidos para consultar compras y referencias de pago.", "Usuario");
         upsertFaq("¿Qué tecnologías usa la aplicación?", "Spring Boot, JPA, Thymeleaf, JWT, RabbitMQ, Redis, WebSockets, Flask, Leaflet, MySQL, Docker, SonarQube, Tailwind CSS y DaisyUI.", "Técnico");
         upsertFaq("¿Cómo funciona el login?", "La autenticación se realiza con JWT almacenado en cookie HttpOnly, por lo que las páginas privadas solo se muestran a usuarios autenticados.", "Seguridad");
         upsertFaq("¿Cómo cierro sesión correctamente?", "Pulsa Logout en la barra superior. La aplicación elimina la cookie JWT y redirige al login.", "Seguridad");

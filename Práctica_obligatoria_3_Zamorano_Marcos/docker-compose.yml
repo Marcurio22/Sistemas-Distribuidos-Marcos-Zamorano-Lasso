@@ -82,6 +82,8 @@ services:
       PLANTIO_GEMINI_MODEL: ${PLANTIO_GEMINI_MODEL:-gemini-2.5-flash}
       PLANTIO_GEMINI_API_KEY: ${PLANTIO_GEMINI_API_KEY:-}
     ports: ["8080:8080"]
+    volumes:
+      - team_uploads:/app/uploads
 
   sonarqube:
     image: sonarqube:10.6-community
@@ -99,3 +101,4 @@ volumes:
   sonar_logs:
   sonar_extensions:
   rabbitmq_data:
+  team_uploads:

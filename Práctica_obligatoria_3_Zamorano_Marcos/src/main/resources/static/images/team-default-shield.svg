@@ -1,0 +1,17 @@
+<!--
+  El Plantío 360 - Escudo rival por defecto.
+  Autor: Marcos Zamorano Lasso
+  Práctica 3 - Sistemas Distribuidos
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Escudo rival por defecto">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#dbe7de"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 18 216 50v67c0 59-38 100-88 121-50-21-88-62-88-121V50l88-32Z" fill="url(#g)" stroke="#1f2933" stroke-width="10"/>
+  <path d="M128 35v181" stroke="#2f8b3f" stroke-width="16" opacity=".85"/>
+  <path d="M58 68h140v49c0 43-27 74-70 93-43-19-70-50-70-93V68Z" fill="none" stroke="#0b1110" stroke-width="8" opacity=".9"/>
+  <text x="128" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="900" fill="#0b1110">FC</text>
+</svg>

@@ -13,11 +13,19 @@ import com.marcos.plantio360.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Controlador de administración para CRUD de entidades principales.
@@ -101,7 +109,16 @@ public class AdminController {
     /** Nuevo partido. */
     @GetMapping("/matches/new")
     public String newMatch(Model model) {
-        model.addAttribute("item", FootballMatch.builder().matchDate(LocalDateTime.now().plusDays(7)).stadium("El Plantío").basePrice(BigDecimal.valueOf(25)).availableTickets(5000).status("PROGRAMADO").build());
+        model.addAttribute("item", FootballMatch.builder()
+            .competition("LaLiga Hypermotion")
+            .matchDate(LocalDateTime.now().plusDays(7))
+            .stadium("El Plantío")
+            .basePrice(BigDecimal.valueOf(25))
+            .availableTickets(5000)
+            .status("PROGRAMADO")
+            .homeGame(true)
+            .imageUrl("/images/team-default-shield.svg")
+            .build());
         return "admin/match-form";
     }
 
@@ -109,9 +126,50 @@ public class AdminController {
     @GetMapping("/matches/{id}/edit")
     public String editMatch(@PathVariable Long id, Model model) { model.addAttribute("item", matchRepository.findById(id).orElseThrow()); return "admin/match-form"; }
 
-    /** Guarda partido. */
-    @PostMapping("/matches")
-    public String saveMatch(@ModelAttribute FootballMatch match) { matchRepository.save(match); return "redirect:/admin/matches"; }
+    /** Guarda partido y permite subir el escudo del rival. */
+    @PostMapping(value = "/matches", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String saveMatch(@ModelAttribute FootballMatch match, @RequestParam(name = "opponentLogo", required = false) MultipartFile opponentLogo, RedirectAttributes redirectAttributes) {
+        try {
+            if (opponentLogo != null && !opponentLogo.isEmpty()) {
+                match.setImageUrl(storeOpponentLogo(opponentLogo));
+            }
+            if (match.getImageUrl() == null || match.getImageUrl().isBlank()) {
+                match.setImageUrl("/images/team-default-shield.svg");
+            }
+            if (match.getHomeGame() == null) {
+                match.setHomeGame(true);
+            }
+            if (match.getStatus() == null || match.getStatus().isBlank()) {
+                match.setStatus("PROGRAMADO");
+            }
+            matchRepository.save(match);
+            redirectAttributes.addFlashAttribute("success", "Partido guardado correctamente");
+            return "redirect:/admin/matches";
+        } catch (IOException exception) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo guardar la imagen del rival. Inténtalo de nuevo.");
+            return match.getId() == null ? "redirect:/admin/matches/new" : "redirect:/admin/matches/" + match.getId() + "/edit";
+        }
+    }
+
+    /**
+     * Guarda físicamente el escudo del rival subido desde administración.
+     *
+     * @param file archivo recibido del formulario.
+     * @return ruta pública para Thymeleaf.
+     * @throws IOException si no se puede escribir el archivo.
+     */
+    private String storeOpponentLogo(MultipartFile file) throws IOException {
+        String originalName = file.getOriginalFilename() == null ? "escudo.png" : file.getOriginalFilename();
+        String extension = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')).toLowerCase(Locale.ROOT) : ".png";
+        if (!extension.matches("\\.(png|jpg|jpeg|webp|svg)")) {
+            extension = ".png";
+        }
+        Path directory = Path.of("uploads", "teams");
+        Files.createDirectories(directory);
+        String filename = "rival-" + UUID.randomUUID() + extension;
+        Files.copy(file.getInputStream(), directory.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+        return "/uploads/teams/" + filename;
+    }
 
     /** Elimina partido. */
     @PostMapping("/matches/{id}/delete")

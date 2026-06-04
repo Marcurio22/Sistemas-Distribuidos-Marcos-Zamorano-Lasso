@@ -43,13 +43,21 @@ function initPlantioChat() {
         stompClient.subscribe('/topic/chat', payload => {
             const message = JSON.parse(payload.body);
             const row = document.createElement('div');
-            row.className = 'chat-message';
+            row.className = 'chat-message chat-message-grid';
+            const wrapper = document.createElement('div');
+            const meta = document.createElement('div');
+            meta.className = 'chat-meta';
             const author = document.createElement('strong');
             author.textContent = message.displayName || 'Aficionado Blanquinegro';
+            const time = document.createElement('time');
+            time.textContent = formatPlantioDateTime(message.createdAt);
             const content = document.createElement('span');
             content.textContent = message.content || '';
-            row.appendChild(author);
-            row.appendChild(content);
+            meta.appendChild(author);
+            meta.appendChild(time);
+            wrapper.appendChild(meta);
+            wrapper.appendChild(content);
+            row.appendChild(wrapper);
             box.appendChild(row);
             box.scrollTop = box.scrollHeight;
         });
@@ -59,6 +67,24 @@ function initPlantioChat() {
         if (event.key === 'Enter') sendChatMessage(stompClient, input);
     });
 }
+/**
+ * Formatea fechas ISO o arrays de LocalDateTime devueltos por Jackson.
+ *
+ * @param {string|Array} value fecha del mensaje.
+ * @returns {string} fecha legible para el muro.
+ */
+function formatPlantioDateTime(value) {
+    if (!value) return new Date().toLocaleString('es-ES', {dateStyle: 'short', timeStyle: 'short'});
+    let date;
+    if (Array.isArray(value)) {
+        date = new Date(value[0], (value[1] || 1) - 1, value[2] || 1, value[3] || 0, value[4] || 0);
+    } else {
+        date = new Date(value);
+    }
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString('es-ES', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+}
+
 
 /**
  * Envía un mensaje por WebSocket cuando hay contenido no vacío.

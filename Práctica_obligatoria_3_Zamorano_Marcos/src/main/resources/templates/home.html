@@ -23,8 +23,8 @@
             </div>
             <div>
                 <div class="hero-card">
-                    <h2 class="text-2xl font-black">Stack distribuido</h2>
-                    <p>Spring Boot, JPA, Thymeleaf, JWT, RabbitMQ, Redis, Flask, WebSockets, MailHog, Docker y SonarQube.</p>
+                    <h2 class="text-2xl font-black">Asistente personal</h2>
+                    <p>Prueba Blanquinegro Bot y resuelve al instante tus dudas sobre partidos, tienda, entradas y servicios del estadio.</p>
                     <a class="btn btn-neutral bg-white text-slate-950 border-white hover:bg-slate-100" th:href="@{/assistant}">Probar Blanquinegro Bot</a>
                 </div>
             </div>
@@ -35,15 +35,19 @@
     <section class="mb-10">
         <div class="section-title"><h2>Próximos partidos</h2><a class="plantio-link-hover" th:href="@{/matches}">Ver todos</a></div>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div th:each="match : ${matches}">
-                <div class="card plantio-card h-full"><div class="card-body">
-                    <span class="badge badge-primary" th:text="${match.competition}">Liga</span>
-                    <h3 class="text-xl font-black mt-3"><a class="plantio-link-hover" th:href="@{/matches/{id}(id=${match.id})}" th:text="'Burgos CF vs ' + ${match.rival}">Partido</a></h3>
-                    <p class="text-slate-500" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</p>
-                    <p><strong th:text="${match.basePrice} + ' €'"></strong> · <span th:text="${match.availableTickets} + ' disponibles'"></span></p>
-                    <a class="btn btn-outline btn-primary" th:href="@{/matches/{id}(id=${match.id})}">Comprar</a>
-                </div></div>
-            </div>
+            <article th:each="match : ${matches}" class="match-card"
+                     th:classappend="${#strings.contains(#strings.toLowerCase(match.competition), 'copa')} ? ' match-card-copa' : ' match-card-laliga'">
+                <div class="match-competition-row">
+                    <span class="match-competition-badge">
+                        <img th:src="${#strings.contains(#strings.toLowerCase(match.competition), 'copa')} ? @{/images/competitions/copa-del-rey.png} : @{/images/competitions/laliga-hypermotion.png}" th:alt="${match.competition}">
+                        <span th:text="${match.competition}">Competición</span>
+                    </span>
+                </div>
+                <h3 class="match-title"><a class="plantio-link-hover" th:href="@{/matches/{id}(id=${match.id})}" th:text="${(match.homeGame == null or match.homeGame) ? 'Burgos CF vs ' + match.rival : match.rival + ' vs Burgos CF'}">Partido</a></h3>
+                <p class="text-slate-500" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</p>
+                <p><strong th:text="${match.basePrice} + ' €'"></strong> · <span th:text="${match.availableTickets} + ' entradas'"></span></p>
+                <a class="btn btn-primary w-full mt-2" th:href="@{/matches/{id}(id=${match.id})}">Comprar entrada</a>
+            </article>
         </div>
     </section>
     <section class="mb-10">

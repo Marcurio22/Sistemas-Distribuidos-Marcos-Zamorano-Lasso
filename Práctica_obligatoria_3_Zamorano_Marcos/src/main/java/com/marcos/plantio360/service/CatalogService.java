@@ -58,9 +58,11 @@ public class CatalogService {
      *
      * @return lista de partidos próximos.
      */
-    @Cacheable(value = "matches", key = "'upcoming'", unless = "#result == null || #result.isEmpty()")
     public List<FootballMatch> findUpcomingMatches() {
-        return matchRepository.findByMatchDateAfterOrderByMatchDateAsc(LocalDateTime.now().minusDays(1));
+        return matchRepository.findAllByOrderByMatchDateAsc().stream()
+            .filter(match -> match.getStatus() == null || !"CANCELADO".equalsIgnoreCase(match.getStatus()))
+            .filter(match -> match.getMatchDate() == null || match.getMatchDate().isAfter(LocalDateTime.now().minusDays(1)))
+            .toList();
     }
 
     /**

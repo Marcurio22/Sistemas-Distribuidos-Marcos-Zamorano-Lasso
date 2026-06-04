@@ -10,25 +10,84 @@
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/matches', 'Volver a partidos')}"></div>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div><div class="card plantio-card"><div class="card-body p-6">
-            <span class="badge badge-primary" th:text="${match.competition}">Competición</span>
-            <h1 class="mt-3" th:text="'Burgos CF vs ' + ${match.rival}">Partido</h1>
-            <p class="text-lg leading-8 text-slate-700" th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')} + ' · ' + ${match.stadium}">Fecha</p>
-            <p>Entradas disponibles: <strong th:text="${match.availableTickets}">0</strong></p>
-            <p>Precio base: <strong th:text="${match.basePrice} + ' €'">0</strong></p>
-        </div></div></div>
-        <div><div class="card plantio-card"><div class="card-body p-6">
-            <h2 class="text-2xl font-black">Pasarela simulada</h2>
-            <form th:action="@{/checkout/ticket/{id}(id=${match.id})}" th:object="${checkout}" method="post">
-                <label class="field-label">Zona</label><select class="select select-bordered w-full mb-3" th:field="*{zone}"><option>Lateral</option><option>Fondo Norte</option><option>Tribuna</option><option>Zona joven</option></select>
-                <label class="field-label">Titular</label><input class="input input-bordered w-full mb-3" th:field="*{cardHolder}" required placeholder="Marcos Zamorano">
-                <label class="field-label">Tarjeta ficticia</label><input class="input input-bordered w-full mb-3" th:field="*{cardNumber}" value="4242424242424242" required>
-                <div class="grid gap-5 md:grid-cols-2"><div><label class="field-label">Caducidad</label><input class="input input-bordered w-full mb-3" th:field="*{expiry}" placeholder="12/30"></div><div><label class="field-label">CVV</label><input class="input input-bordered w-full mb-3" th:field="*{cvv}" placeholder="123"></div></div>
-                <button class="btn btn-accent w-full">Confirmar compra</button>
-            </form>
-        </div></div></div>
+    <div th:replace="~{fragments/common :: backLink('/matches', 'Volver a partidos')}"></div>
+    <div class="grid gap-7 lg:grid-cols-[1.1fr_.9fr]">
+        <section class="match-detail-hero"
+                 th:classappend="${#strings.contains(#strings.toLowerCase(match.competition), 'copa')} ? ' match-card-copa' : ' match-card-laliga'">
+            <div class="match-competition-row">
+                <span class="match-competition-badge">
+                    <img th:src="${#strings.contains(#strings.toLowerCase(match.competition), 'copa')} ? @{/images/competitions/copa-del-rey.png} : @{/images/competitions/laliga-hypermotion.png}" th:alt="${match.competition}">
+                    <span th:text="${match.competition}">Competición</span>
+                </span>
+            </div>
+            <div class="match-teams match-teams-large">
+                <div class="match-team" th:if="${match.homeGame == null or match.homeGame}">
+                    <img th:src="@{/images/burgos-cf-shield.png}" alt="Burgos CF"><span>Burgos CF</span>
+                </div>
+                <div class="match-team" th:unless="${match.homeGame == null or match.homeGame}">
+                    <img th:src="${match.imageUrl ?: '/images/team-default-shield.svg'}" th:alt="${match.rival}"><span th:text="${match.rival}">Rival</span>
+                </div>
+                <strong class="match-versus">VS</strong>
+                <div class="match-team" th:if="${match.homeGame == null or match.homeGame}">
+                    <img th:src="${match.imageUrl ?: '/images/team-default-shield.svg'}" th:alt="${match.rival}"><span th:text="${match.rival}">Rival</span>
+                </div>
+                <div class="match-team" th:unless="${match.homeGame == null or match.homeGame}">
+                    <img th:src="@{/images/burgos-cf-shield.png}" alt="Burgos CF"><span>Burgos CF</span>
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight mt-5"
+                th:text="${(match.homeGame == null or match.homeGame) ? 'Burgos CF vs ' + match.rival : match.rival + ' vs Burgos CF'}">Partido</h1>
+            <div class="match-data-grid mt-6">
+                <div><span>Fecha</span><strong th:text="${#temporals.format(match.matchDate, 'dd/MM/yyyy HH:mm')}">Fecha</strong></div>
+                <div><span>Estadio</span><strong th:text="${match.stadium}">El Plantío</strong></div>
+                <div><span>Disponibles</span><strong th:text="${match.availableTickets}">0</strong></div>
+                <div><span>Precio base</span><strong th:text="${match.basePrice} + ' €'">0</strong></div>
+            </div>
+        </section>
+
+        <section class="card plantio-card">
+            <div class="card-body p-6 md:p-8">
+                <h2 class="text-2xl font-black">Pasarela simulada</h2>
+                <p class="text-sm font-semibold text-slate-600">Pago académico ficticio. No se almacena ningún dato real de tarjeta.</p>
+                <form class="mt-3 space-y-4" th:action="@{/checkout/ticket/{id}(id=${match.id})}" th:object="${checkout}" method="post" autocomplete="off" data-form-type="other">
+                    <div>
+                        <label class="field-label" for="zone">Zona</label>
+                        <select id="zone" class="select select-bordered w-full" th:field="*{zone}">
+                            <option value="Lateral">Lateral</option>
+                            <option value="Fondo Norte">Fondo Norte</option>
+                            <option value="Tribuna">Tribuna</option>
+                            <option value="Zona joven">Zona joven</option>
+                        </select>
+                    </div>
+                    <input type="hidden" th:field="*{cardHolder}" data-demo-holder-hidden>
+                    <input type="hidden" th:field="*{cardNumber}" data-demo-number-hidden>
+                    <input type="hidden" th:field="*{expiry}" data-demo-expiry-hidden>
+                    <input type="hidden" th:field="*{cvv}" data-demo-cvv-hidden>
+                    <div>
+                        <label class="field-label" for="ticketHolderInput">Titular</label>
+                        <input id="ticketHolderInput" name="ticketHolderInput" class="input input-bordered w-full" type="text" placeholder="Ej: Marcos Zamorano" autocomplete="off" data-form-type="other" data-demo-holder-input required>
+                    </div>
+                    <div>
+                        <label class="field-label" for="ticketNumberInput">Código de pago simulado</label>
+                        <input id="ticketNumberInput" name="ticketNumberInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" autocomplete="off" data-form-type="other" data-demo-number-input required>
+                    </div>
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <div>
+                            <label class="field-label" for="ticketExpiryInput">Caducidad</label>
+                            <input id="ticketExpiryInput" name="ticketExpiryInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="5" placeholder="12/30" autocomplete="off" data-form-type="other" data-demo-expiry-input required>
+                        </div>
+                        <div>
+                            <label class="field-label" for="ticketCvvInput">CVV simulado</label>
+                            <input id="ticketCvvInput" name="ticketCvvInput" class="input input-bordered w-full" type="text" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="off" data-form-type="other" data-demo-cvv-input required>
+                        </div>
+                    </div>
+                    <button class="btn btn-accent w-full" th:disabled="${match.availableTickets == null or match.availableTickets <= 0}" type="submit">
+                        <span th:if="${match.availableTickets != null and match.availableTickets > 0}">Confirmar compra</span>
+                        <span th:if="${match.availableTickets == null or match.availableTickets <= 0}">Sin entradas disponibles</span>
+                    </button>
+                </form>
+            </div>
+        </section>
     </div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>

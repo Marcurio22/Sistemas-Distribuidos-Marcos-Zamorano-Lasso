@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 /** Repositorio JPA de partidos. */
 public interface FootballMatchRepository extends JpaRepository<FootballMatch, Long> {
-    /** Devuelve próximos partidos. */
+    /** Devuelve próximos partidos desde una fecha. */
     List<FootballMatch> findByMatchDateAfterOrderByMatchDateAsc(LocalDateTime now);
+
+    /** Devuelve todos los partidos ordenados por fecha. */
+    List<FootballMatch> findAllByOrderByMatchDateAsc();
 }
