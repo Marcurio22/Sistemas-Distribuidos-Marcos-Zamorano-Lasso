@@ -81,68 +81,47 @@ public class UserService {
     public List<AppUser> findAll() { return userRepository.findAll(); }
 
     /** Busca por id. */
-    public AppUser findById(Long id) { return userRepository.findById(id).orElseThrow(); }
+    public AppUser findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe el usuario indicado."));
+    }
 
     /** Busca por email. */
     public AppUser findByEmail(String email) { return userRepository.findByEmail(email).orElseThrow(); }
 
+    /** Comprueba si existe email. */
+    public boolean existsByEmail(String email) { return userRepository.existsByEmail(email); }
+
+    /** Comprueba si existe email en otro usuario. */
+    public boolean existsByEmailAndIdNot(String email, Long id) { return userRepository.existsByEmailAndIdNot(email, id); }
+
     /**
-     * Guarda usuario desde administración sin permitir cambios de contraseña desde el panel.
+     * Guarda usuario desde administración, codificando contraseña si procede.
      *
      * @param user usuario recibido.
      * @return usuario guardado.
      */
     @Transactional
     public AppUser saveAdmin(AppUser user) {
-        validateAdminUser(user);
         AppUser persisted = user.getId() == null ? null : findById(user.getId());
-        validateUniqueEmail(user, persisted);
-
         if (persisted != null) {
-            user.setPassword(persisted.getPassword());
             user.setCreatedAt(persisted.getCreatedAt());
             if (user.getAvatarUrl() == null || user.getAvatarUrl().isBlank()) {
                 user.setAvatarUrl(persisted.getAvatarUrl());
             }
-        } else {
-            user.setPassword(passwordEncoder.encode("user1234"));
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            if (persisted == null) {
+                user.setPassword(passwordEncoder.encode("user1234"));
+            } else {
+                user.setPassword(persisted.getPassword());
+            }
+        } else if (!user.getPassword().startsWith("$2")) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         if (user.getAvatarUrl() == null || user.getAvatarUrl().isBlank()) {
             user.setAvatarUrl("/images/avatar.svg");
         }
-        if (user.getRole() == null || user.getRole().isBlank()) {
-            user.setRole("ROLE_USER");
-        }
         return userRepository.save(user);
-    }
-
-    /**
-     * Valida campos básicos editables desde administración.
-     *
-     * @param user usuario recibido.
-     */
-    private void validateAdminUser(AppUser user) {
-        if (user.getFirstName() == null || user.getFirstName().isBlank()) throw new IllegalArgumentException("El nombre es obligatorio.");
-        if (user.getLastName() == null || user.getLastName().isBlank()) throw new IllegalArgumentException("Los apellidos son obligatorios.");
-        if (user.getEmail() == null || user.getEmail().isBlank()) throw new IllegalArgumentException("El correo electrónico es obligatorio.");
-        if (!user.getEmail().contains("@")) throw new IllegalArgumentException("El correo electrónico no tiene un formato válido.");
-        if (user.getRole() == null || !(user.getRole().equals("ROLE_USER") || user.getRole().equals("ROLE_ADMIN"))) {
-            throw new IllegalArgumentException("El rol seleccionado no es válido.");
-        }
-    }
-
-    /**
-     * Evita duplicados de email al crear o editar usuarios.
-     *
-     * @param user usuario recibido.
-     * @param persisted usuario persistido, si se está editando.
-     */
-    private void validateUniqueEmail(AppUser user, AppUser persisted) {
-        userRepository.findByEmail(user.getEmail()).ifPresent(existing -> {
-            if (persisted == null || !existing.getId().equals(persisted.getId())) {
-                throw new IllegalArgumentException("Ya existe un usuario con ese correo electrónico.");
-            }
-        });
     }
 
     /** Elimina usuario por id. */

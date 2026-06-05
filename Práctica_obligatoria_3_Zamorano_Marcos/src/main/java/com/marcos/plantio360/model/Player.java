@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "players")
+@Table(name = "players", uniqueConstraints = @UniqueConstraint(name = "uk_players_dorsal", columnNames = "dorsal"))
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -52,8 +52,19 @@ public class Player implements Serializable {
      */
     @PrePersist
     public void prePersist() {
-        if (status == null) status = "DISPONIBLE";
+        applyDefaults();
+    }
+
+    /** Completa valores por defecto también al actualizar. */
+    @PreUpdate
+    public void preUpdate() {
+        applyDefaults();
+    }
+
+    private void applyDefaults() {
+        if (status == null || status.isBlank()) status = "DISPONIBLE";
         if (goals == null) goals = 0;
         if (assists == null) assists = 0;
+        if (imageUrl == null || imageUrl.isBlank()) imageUrl = "/images/avatar.svg";
     }
 }

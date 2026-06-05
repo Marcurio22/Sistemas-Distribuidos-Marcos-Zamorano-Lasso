@@ -7,23 +7,31 @@
 
 package com.marcos.plantio360.controller;
 
+import com.marcos.plantio360.dto.AdminMatchForm;
+import com.marcos.plantio360.dto.AdminPlayerForm;
+import com.marcos.plantio360.dto.AdminUserForm;
 import com.marcos.plantio360.model.*;
 import com.marcos.plantio360.repository.*;
 import com.marcos.plantio360.service.AdminExportService;
 import com.marcos.plantio360.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -33,6 +41,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,12 +50,16 @@ import java.util.UUID;
 /**
  * Controlador de administración para CRUD de entidades principales y exportaciones.
  */
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter HTML_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private static final long MAX_IMAGE_BYTES = 64L * 1024L * 1024L;
+    private static final String DEFAULT_AVATAR = "/images/avatar.svg";
+    private static final String DEFAULT_TEAM_SHIELD = "/images/team-default-shield.svg";
     private static final List<String> COMPETITIONS = List.of("LaLiga Hypermotion", "Copa del Rey");
     private static final List<String> PLAYER_POSITIONS = List.of("Portero", "Defensa", "Centrocampista", "Delantero");
     private static final List<String> PLAYER_STATUSES = List.of("DISPONIBLE", "FENOMENAL", "LESIONADO", "SANCIONADO", "DUDA", "CEDIDO", "NO DISPONIBLE");
@@ -88,27 +101,43 @@ public class AdminController {
     /** Formulario de usuario. */
     @GetMapping("/users/new")
     public String newUser(Model model) {
-        model.addAttribute("item", AppUser.builder().role("ROLE_USER").enabled(true).avatarUrl("/images/avatar.svg").build());
+        model.addAttribute("item", AdminUserForm.empty());
         return "admin/user-form";
     }
 
     /** Edición de usuario. */
     @GetMapping("/users/{id}/edit")
     public String editUser(@PathVariable Long id, Model model) {
-        model.addAttribute("item", userService.findById(id));
+        model.addAttribute("item", AdminUserForm.from(userService.findById(id)));
         return "admin/user-form";
     }
 
-    /** Guarda usuario sin permitir cambios de contraseña desde administración. */
+    /** Guarda usuario sin permitir que el administrador cambie contraseñas. */
     @PostMapping("/users")
-    public String saveUser(@ModelAttribute("item") AppUser user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String saveUser(@ModelAttribute("item") AdminUserForm form,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
         try {
-            if (bindingResult.hasErrors()) return userFormError(model, user, bindingMessage("usuario", bindingResult));
+            Long id = parseId(form.getId(), "usuario");
+            AppUser user = id == null ? AppUser.builder().avatarUrl(DEFAULT_AVATAR).build() : userService.findById(id);
+            String email = normalizeEmail(form.getEmail());
+            if (isBlank(form.getFirstName())) throw new IllegalArgumentException("El nombre del usuario es obligatorio.");
+            if (isBlank(form.getLastName())) throw new IllegalArgumentException("Los apellidos del usuario son obligatorios.");
+            if (isBlank(email) || !email.contains("@")) throw new IllegalArgumentException("Introduce un correo electrónico válido.");
+            if (isEmailInUse(email, id)) throw new IllegalArgumentException("Ya existe otro usuario con ese correo electrónico.");
+            if (!List.of("ROLE_USER", "ROLE_ADMIN").contains(form.getRole())) throw new IllegalArgumentException("El rol seleccionado no es válido.");
+            user.setFirstName(form.getFirstName().trim());
+            user.setLastName(form.getLastName().trim());
+            user.setEmail(email);
+            user.setPhone(emptyToNull(form.getPhone()));
+            user.setRole(form.getRole());
+            user.setEnabled(Boolean.TRUE.equals(form.getEnabled()));
+            user.setAvatarUrl(isBlank(form.getAvatarUrl()) ? DEFAULT_AVATAR : form.getAvatarUrl());
             userService.saveAdmin(user);
             redirectAttributes.addFlashAttribute("success", "Usuario guardado correctamente.");
             return "redirect:/admin/users";
         } catch (RuntimeException exception) {
-            return userFormError(model, user, "No se pudo guardar el usuario: " + safeError(exception));
+            return userFormError(model, form, "No se pudo guardar el usuario: " + friendly(exception));
         }
     }
 
@@ -130,36 +159,78 @@ public class AdminController {
     /** Nuevo jugador. */
     @GetMapping("/players/new")
     public String newPlayer(Model model) {
-        Player player = Player.builder().status("DISPONIBLE").position("Delantero").nationality("España").goals(0).assists(0).imageUrl("/images/avatar.svg").build();
-        model.addAttribute("item", player);
-        addPlayerFormOptions(model, player);
-        return "admin/player-form";
+        return playerForm(model, AdminPlayerForm.empty(), null);
     }
 
     /** Edita jugador. */
     @GetMapping("/players/{id}/edit")
     public String editPlayer(@PathVariable Long id, Model model) {
-        Player player = playerRepository.findById(id).orElseThrow();
-        model.addAttribute("item", player);
-        addPlayerFormOptions(model, player);
-        return "admin/player-form";
+        return playerForm(model, AdminPlayerForm.from(findPlayer(id)), null);
     }
 
     /** Guarda jugador y permite subir imagen. */
-    @PostMapping("/players")
-    public String savePlayer(@ModelAttribute("item") Player player, BindingResult bindingResult, @RequestParam(name = "playerImage", required = false) MultipartFile playerImage, Model model, RedirectAttributes redirectAttributes) {
+    @PostMapping(value = "/players", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String savePlayer(HttpServletRequest request,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
+        log.info("POST /admin/players recibido. contentLength={}, contentType={}", request.getContentLengthLong(), request.getContentType());
+        AdminPlayerForm form = AdminPlayerForm.empty();
         try {
-            preservePlayerImage(player);
-            if (bindingResult.hasErrors()) return playerFormError(model, player, bindingMessage("jugador", bindingResult));
-            validatePlayer(player);
-            if (hasFile(playerImage)) player.setImageUrl(storeUploadedImage(playerImage, "players", "jugador"));
-            normalizePlayer(player);
+            form = readPlayerForm(request);
+            MultipartFile playerImage = multipartFile(request, "playerImage");
+            Long id = parseId(form.getId(), "jugador");
+            Player player = id == null ? new Player() : findPlayer(id);
+            String previousImage = player.getImageUrl();
+            Integer dorsalNumber = parseInteger(form.getDorsal(), "dorsal", true);
+            if (dorsalNumber == null) throw new IllegalArgumentException("Selecciona un dorsal disponible.");
+            if (dorsalNumber < 1 || dorsalNumber > 99) throw new IllegalArgumentException("El dorsal debe estar entre 1 y 99.");
+            if (isDorsalInUse(dorsalNumber, id)) throw new IllegalArgumentException("El dorsal " + dorsalNumber + " ya está asignado a otro jugador.");
+            if (isBlank(form.getName())) throw new IllegalArgumentException("El nombre del jugador es obligatorio.");
+            if (!PLAYER_POSITIONS.contains(form.getPosition())) throw new IllegalArgumentException("Selecciona una posición válida.");
+            if (isBlank(form.getNationality())) throw new IllegalArgumentException("La nacionalidad del jugador es obligatoria.");
+            if (!PLAYER_STATUSES.contains(form.getStatus())) throw new IllegalArgumentException("Selecciona un estado válido.");
+            Integer parsedAge = parseInteger(form.getAge(), "edad", false);
+            BigDecimal parsedHeight = parseBigDecimal(form.getHeight(), "altura", false);
+            BigDecimal parsedWeight = parseBigDecimal(form.getWeight(), "peso", false);
+            Integer parsedGoals = parseInteger(form.getGoals(), "goles", false);
+            Integer parsedAssists = parseInteger(form.getAssists(), "asistencias", false);
+            if (parsedAge != null && (parsedAge < 16 || parsedAge > 60)) throw new IllegalArgumentException("La edad debe estar entre 16 y 60 años.");
+            if (parsedHeight != null && (parsedHeight.compareTo(BigDecimal.valueOf(1.40)) < 0 || parsedHeight.compareTo(BigDecimal.valueOf(2.20)) > 0)) throw new IllegalArgumentException("La altura debe estar entre 1.40 y 2.20 metros.");
+            if (parsedWeight != null && (parsedWeight.compareTo(BigDecimal.valueOf(45)) < 0 || parsedWeight.compareTo(BigDecimal.valueOf(120)) > 0)) throw new IllegalArgumentException("El peso debe estar entre 45 y 120 kg.");
+            if (parsedGoals != null && parsedGoals < 0) throw new IllegalArgumentException("Los goles no pueden ser negativos.");
+            if (parsedAssists != null && parsedAssists < 0) throw new IllegalArgumentException("Las asistencias no pueden ser negativas.");
+            player.setDorsal(dorsalNumber);
+            player.setName(form.getName().trim());
+            player.setPosition(form.getPosition());
+            player.setNationality(form.getNationality().trim());
+            player.setStatus(form.getStatus());
+            player.setAge(parsedAge);
+            player.setHeight(parsedHeight);
+            player.setWeight(parsedWeight);
+            player.setGoals(parsedGoals == null ? 0 : parsedGoals);
+            player.setAssists(parsedAssists == null ? 0 : parsedAssists);
+            player.setDescription(emptyToNull(form.getDescription()));
+            if (playerImage != null && !playerImage.isEmpty()) {
+                player.setImageUrl(storeUploadedImage(playerImage, "players", "jugador"));
+            } else if (!isBlank(previousImage)) {
+                player.setImageUrl(previousImage);
+            } else {
+                player.setImageUrl(DEFAULT_AVATAR);
+            }
             playerRepository.save(player);
             redirectAttributes.addFlashAttribute("success", "Jugador guardado correctamente.");
             return "redirect:/admin/players";
+        } catch (MaxUploadSizeExceededException exception) {
+            return playerForm(model, form, "La imagen supera el tamaño máximo permitido de 64MB. Selecciona una imagen más ligera.");
+        } catch (MultipartException exception) {
+            return playerForm(model, form, "No se pudo leer el formulario multipart. Si adjuntaste una imagen, comprueba que sea PNG, JPG, JPEG, WEBP o SVG y que no supere 64MB.");
+        } catch (IllegalStateException exception) {
+            if (isMultipartFailure(exception)) {
+                return playerForm(model, form, "No se pudo leer el formulario multipart. Si adjuntaste una imagen, comprueba que sea PNG, JPG, JPEG, WEBP o SVG y que no supere 64MB.");
+            }
+            return playerForm(model, form, "No se pudo guardar el jugador: " + friendly(exception));
         } catch (RuntimeException | IOException exception) {
-            preservePlayerImage(player);
-            return playerFormError(model, player, "No se pudo guardar el jugador: " + safeError(exception));
+            return playerForm(model, form, "No se pudo guardar el jugador: " + friendly(exception));
         }
     }
 
@@ -181,43 +252,76 @@ public class AdminController {
     /** Nuevo partido. */
     @GetMapping("/matches/new")
     public String newMatch(Model model) {
-        model.addAttribute("item", FootballMatch.builder()
+        FootballMatch match = FootballMatch.builder()
             .competition("LaLiga Hypermotion")
-            .matchDate(LocalDateTime.now().plusDays(7))
+            .matchDate(LocalDateTime.now().plusDays(7).withSecond(0).withNano(0))
             .stadium("El Plantío")
             .basePrice(BigDecimal.valueOf(25))
             .availableTickets(5000)
             .status("PROGRAMADO")
             .homeGame(true)
-            .imageUrl("/images/team-default-shield.svg")
-            .build());
-        addMatchFormOptions(model);
-        return "admin/match-form";
+            .imageUrl(DEFAULT_TEAM_SHIELD)
+            .build();
+        return matchForm(model, AdminMatchForm.from(match, HTML_DATETIME), null);
     }
 
     /** Edita partido. */
     @GetMapping("/matches/{id}/edit")
     public String editMatch(@PathVariable Long id, Model model) {
-        model.addAttribute("item", matchRepository.findById(id).orElseThrow());
-        addMatchFormOptions(model);
-        return "admin/match-form";
+        return matchForm(model, AdminMatchForm.from(findMatch(id), HTML_DATETIME), null);
     }
 
     /** Guarda partido y permite subir el escudo del rival. */
-    @PostMapping("/matches")
-    public String saveMatch(@ModelAttribute("item") FootballMatch match, BindingResult bindingResult, @RequestParam(name = "opponentLogo", required = false) MultipartFile opponentLogo, Model model, RedirectAttributes redirectAttributes) {
+    @PostMapping(value = "/matches", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String saveMatch(HttpServletRequest request,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
+        log.info("POST /admin/matches recibido. contentLength={}, contentType={}", request.getContentLengthLong(), request.getContentType());
+        AdminMatchForm form = AdminMatchForm.builder().homeGame(true).build();
         try {
-            preserveMatchImage(match);
-            if (bindingResult.hasErrors()) return matchFormError(model, match, bindingMessage("partido", bindingResult));
-            validateMatch(match);
-            if (hasFile(opponentLogo)) match.setImageUrl(storeUploadedImage(opponentLogo, "teams", "rival"));
-            normalizeMatch(match);
+            form = readMatchForm(request);
+            MultipartFile opponentLogo = multipartFile(request, "opponentLogo");
+            Long id = parseId(form.getId(), "partido");
+            FootballMatch match = id == null ? new FootballMatch() : findMatch(id);
+            String previousImage = match.getImageUrl();
+            if (isBlank(form.getRival())) throw new IllegalArgumentException("El rival es obligatorio.");
+            if (!COMPETITIONS.contains(form.getCompetition())) throw new IllegalArgumentException("Selecciona una competición válida.");
+            LocalDateTime parsedDate = parseHtmlDateTime(form.getMatchDateValue());
+            BigDecimal parsedPrice = parseBigDecimal(form.getBasePrice(), "precio base", true);
+            Integer parsedTickets = parseInteger(form.getAvailableTickets(), "entradas disponibles", true);
+            if (parsedPrice.compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("El precio base no puede ser negativo.");
+            if (parsedTickets < 0) throw new IllegalArgumentException("Las entradas disponibles no pueden ser negativas.");
+            if (!List.of("PROGRAMADO", "JUGADO", "CANCELADO").contains(form.getStatus())) throw new IllegalArgumentException("Selecciona un estado válido.");
+            boolean homeGame = !Boolean.FALSE.equals(form.getHomeGame());
+            match.setRival(form.getRival().trim());
+            match.setCompetition(form.getCompetition());
+            match.setMatchDate(parsedDate);
+            match.setStadium(isBlank(form.getStadium()) ? (homeGame ? "El Plantío" : "Estadio rival") : form.getStadium().trim());
+            match.setBasePrice(parsedPrice);
+            match.setAvailableTickets(parsedTickets);
+            match.setStatus(form.getStatus());
+            match.setHomeGame(homeGame);
+            if (opponentLogo != null && !opponentLogo.isEmpty()) {
+                match.setImageUrl(storeUploadedImage(opponentLogo, "teams", "rival"));
+            } else if (!isBlank(previousImage)) {
+                match.setImageUrl(previousImage);
+            } else {
+                match.setImageUrl(DEFAULT_TEAM_SHIELD);
+            }
             matchRepository.save(match);
             redirectAttributes.addFlashAttribute("success", "Partido guardado correctamente.");
             return "redirect:/admin/matches";
+        } catch (MaxUploadSizeExceededException exception) {
+            return matchForm(model, form, "La imagen supera el tamaño máximo permitido de 64MB. Selecciona una imagen más ligera.");
+        } catch (MultipartException exception) {
+            return matchForm(model, form, "No se pudo leer el formulario multipart. Si adjuntaste una imagen, comprueba que sea PNG, JPG, JPEG, WEBP o SVG y que no supere 64MB.");
+        } catch (IllegalStateException exception) {
+            if (isMultipartFailure(exception)) {
+                return matchForm(model, form, "No se pudo leer el formulario multipart. Si adjuntaste una imagen, comprueba que sea PNG, JPG, JPEG, WEBP o SVG y que no supere 64MB.");
+            }
+            return matchForm(model, form, "No se pudo guardar el partido: " + friendly(exception));
         } catch (RuntimeException | IOException exception) {
-            preserveMatchImage(match);
-            return matchFormError(model, match, "No se pudo guardar el partido: " + safeError(exception));
+            return matchForm(model, form, "No se pudo guardar el partido: " + friendly(exception));
         }
     }
 
@@ -240,34 +344,55 @@ public class AdminController {
     @GetMapping("/products/new")
     public String newProduct(Model model) {
         Product product = Product.builder().active(true).stock(25).price(BigDecimal.TEN).category("Textil").imageUrl("/images/product.svg").build();
-        model.addAttribute("item", product);
-        addProductFormOptions(model);
-        return "admin/product-form";
+        return productForm(model, product, null);
     }
 
     /** Edita producto. */
     @GetMapping("/products/{id}/edit")
     public String editProduct(@PathVariable Long id, Model model) {
-        model.addAttribute("item", productRepository.findById(id).orElseThrow());
-        addProductFormOptions(model);
-        return "admin/product-form";
+        return productForm(model, productRepository.findById(id).orElseThrow(), null);
     }
 
     /** Guarda producto y permite subir imagen. */
     @PostMapping("/products")
-    public String saveProduct(@ModelAttribute("item") Product product, BindingResult bindingResult, @RequestParam(name = "productImage", required = false) MultipartFile productImage, Model model, RedirectAttributes redirectAttributes) {
+    public String saveProduct(@RequestParam(required = false) Long id,
+                              @RequestParam String name,
+                              @RequestParam(required = false) String description,
+                              @RequestParam String price,
+                              @RequestParam String stock,
+                              @RequestParam String category,
+                              @RequestParam(name = "active", defaultValue = "false") boolean active,
+                              @RequestParam(name = "productImage", required = false) MultipartFile productImage,
+                              Model model,
+                              RedirectAttributes redirectAttributes) {
+        Product product = id == null ? new Product() : productRepository.findById(id).orElseThrow();
+        String previousImage = product.getImageUrl();
         try {
-            preserveProductImage(product);
-            if (bindingResult.hasErrors()) return productFormError(model, product, bindingMessage("producto", bindingResult));
-            validateProduct(product);
-            if (hasFile(productImage)) product.setImageUrl(storeUploadedImage(productImage, "products", "producto"));
-            normalizeProduct(product);
+            if (isBlank(name)) throw new IllegalArgumentException("El nombre del producto es obligatorio.");
+            if (!PRODUCT_CATEGORIES.contains(category)) throw new IllegalArgumentException("Selecciona una categoría válida.");
+            BigDecimal parsedPrice = parseBigDecimal(price, "precio", true);
+            Integer parsedStock = parseInteger(stock, "stock", true);
+            if (parsedPrice.compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("El precio no puede ser negativo.");
+            if (parsedStock < 0) throw new IllegalArgumentException("El stock no puede ser negativo.");
+            product.setName(name.trim());
+            product.setDescription(emptyToNull(description));
+            product.setPrice(parsedPrice);
+            product.setStock(parsedStock);
+            product.setCategory(category);
+            product.setActive(active);
+            if (productImage != null && !productImage.isEmpty()) {
+                product.setImageUrl(storeUploadedImage(productImage, "products", "producto"));
+            } else if (!isBlank(previousImage)) {
+                product.setImageUrl(previousImage);
+            } else {
+                product.setImageUrl("/images/product.svg");
+            }
             productRepository.save(product);
             redirectAttributes.addFlashAttribute("success", "Producto guardado correctamente.");
             return "redirect:/admin/products";
         } catch (RuntimeException | IOException exception) {
-            preserveProductImage(product);
-            return productFormError(model, product, "No se pudo guardar el producto: " + safeError(exception));
+            if (isBlank(product.getImageUrl())) product.setImageUrl(previousImage == null ? "/images/product.svg" : previousImage);
+            return productForm(model, product, "No se pudo guardar el producto: " + friendly(exception));
         }
     }
 
@@ -289,30 +414,40 @@ public class AdminController {
     /** Nuevo punto del mapa. */
     @GetMapping("/map-points/new")
     public String newMapPoint(Model model) {
-        model.addAttribute("item", MapPoint.builder().type("PARKING").latitude(BigDecimal.valueOf(42.3501)).longitude(BigDecimal.valueOf(-3.6892)).build());
-        addMapPointFormOptions(model);
-        return "admin/map-point-form";
+        MapPoint point = MapPoint.builder().type("PARKING").latitude(BigDecimal.valueOf(42.3501)).longitude(BigDecimal.valueOf(-3.6892)).build();
+        return mapPointForm(model, point, null);
     }
 
     /** Edita punto del mapa. */
     @GetMapping("/map-points/{id}/edit")
     public String editMapPoint(@PathVariable Long id, Model model) {
-        model.addAttribute("item", mapPointRepository.findById(id).orElseThrow());
-        addMapPointFormOptions(model);
-        return "admin/map-point-form";
+        return mapPointForm(model, mapPointRepository.findById(id).orElseThrow(), null);
     }
 
     /** Guarda punto del mapa. */
     @PostMapping("/map-points")
-    public String saveMapPoint(@ModelAttribute("item") MapPoint point, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String saveMapPoint(@RequestParam(required = false) Long id,
+                               @RequestParam String name,
+                               @RequestParam String type,
+                               @RequestParam String latitude,
+                               @RequestParam String longitude,
+                               @RequestParam(required = false) String description,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        MapPoint point = id == null ? new MapPoint() : mapPointRepository.findById(id).orElseThrow();
         try {
-            if (bindingResult.hasErrors()) return mapPointFormError(model, point, bindingMessage("punto del mapa", bindingResult));
-            validateMapPoint(point);
+            if (isBlank(name)) throw new IllegalArgumentException("El nombre del punto es obligatorio.");
+            if (!MAP_POINT_TYPES.contains(type)) throw new IllegalArgumentException("Selecciona un tipo de punto válido.");
+            point.setName(name.trim());
+            point.setType(type);
+            point.setLatitude(parseBigDecimal(latitude, "latitud", true));
+            point.setLongitude(parseBigDecimal(longitude, "longitud", true));
+            point.setDescription(emptyToNull(description));
             mapPointRepository.save(point);
             redirectAttributes.addFlashAttribute("success", "Punto de mapa guardado correctamente.");
             return "redirect:/admin/map-points";
         } catch (RuntimeException exception) {
-            return mapPointFormError(model, point, "No se pudo guardar el punto: " + safeError(exception));
+            return mapPointForm(model, point, "No se pudo guardar el punto de mapa: " + friendly(exception));
         }
     }
 
@@ -334,31 +469,47 @@ public class AdminController {
     /** Nuevo sensor. */
     @GetMapping("/sensors/new")
     public String newSensor(Model model) {
-        model.addAttribute("item", SensorReading.builder().type("PARKING").status("NORMAL").value(BigDecimal.ZERO).unit("%").latitude(BigDecimal.valueOf(42.3501)).longitude(BigDecimal.valueOf(-3.6892)).capturedAt(LocalDateTime.now()).build());
-        addSensorFormOptions(model);
-        return "admin/sensor-form";
+        SensorReading sensor = SensorReading.builder().type("PARKING").status("NORMAL").value(BigDecimal.ZERO).unit("%").latitude(BigDecimal.valueOf(42.3501)).longitude(BigDecimal.valueOf(-3.6892)).capturedAt(LocalDateTime.now()).build();
+        return sensorForm(model, sensor, null);
     }
 
     /** Edita sensor. */
     @GetMapping("/sensors/{id}/edit")
     public String editSensor(@PathVariable Long id, Model model) {
-        model.addAttribute("item", sensorReadingRepository.findById(id).orElseThrow());
-        addSensorFormOptions(model);
-        return "admin/sensor-form";
+        return sensorForm(model, sensorReadingRepository.findById(id).orElseThrow(), null);
     }
 
     /** Guarda sensor. */
     @PostMapping("/sensors")
-    public String saveSensor(@ModelAttribute("item") SensorReading sensor, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String saveSensor(@RequestParam(required = false) Long id,
+                             @RequestParam String name,
+                             @RequestParam String type,
+                             @RequestParam String value,
+                             @RequestParam String unit,
+                             @RequestParam String status,
+                             @RequestParam String latitude,
+                             @RequestParam String longitude,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
+        SensorReading sensor = id == null ? new SensorReading() : sensorReadingRepository.findById(id).orElseThrow();
         try {
-            if (bindingResult.hasErrors()) return sensorFormError(model, sensor, bindingMessage("sensor", bindingResult));
-            validateSensor(sensor);
+            if (isBlank(name)) throw new IllegalArgumentException("El nombre del sensor es obligatorio.");
+            if (!SENSOR_TYPES.contains(type)) throw new IllegalArgumentException("Selecciona un tipo de sensor válido.");
+            if (isBlank(unit)) throw new IllegalArgumentException("La unidad del sensor es obligatoria.");
+            if (!SENSOR_STATUSES.contains(status)) throw new IllegalArgumentException("Selecciona un estado de sensor válido.");
+            sensor.setName(name.trim());
+            sensor.setType(type);
+            sensor.setValue(parseBigDecimal(value, "valor", true));
+            sensor.setUnit(unit.trim());
+            sensor.setStatus(status);
+            sensor.setLatitude(parseBigDecimal(latitude, "latitud", true));
+            sensor.setLongitude(parseBigDecimal(longitude, "longitud", true));
             if (sensor.getCapturedAt() == null) sensor.setCapturedAt(LocalDateTime.now());
             sensorReadingRepository.save(sensor);
             redirectAttributes.addFlashAttribute("success", "Sensor guardado correctamente.");
             return "redirect:/admin/sensors";
         } catch (RuntimeException exception) {
-            return sensorFormError(model, sensor, "No se pudo guardar el sensor: " + safeError(exception));
+            return sensorForm(model, sensor, "No se pudo guardar el sensor: " + friendly(exception));
         }
     }
 
@@ -380,30 +531,38 @@ public class AdminController {
     /** Nueva FAQ. */
     @GetMapping("/faqs/new")
     public String newFaq(Model model) {
-        model.addAttribute("item", Faq.builder().active(true).category("General").build());
-        addFaqFormOptions(model);
-        return "admin/faq-form";
+        return faqForm(model, Faq.builder().active(true).category("General").build(), null);
     }
 
     /** Edita FAQ. */
     @GetMapping("/faqs/{id}/edit")
     public String editFaq(@PathVariable Long id, Model model) {
-        model.addAttribute("item", faqRepository.findById(id).orElseThrow());
-        addFaqFormOptions(model);
-        return "admin/faq-form";
+        return faqForm(model, faqRepository.findById(id).orElseThrow(), null);
     }
 
     /** Guarda FAQ. */
     @PostMapping("/faqs")
-    public String saveFaq(@ModelAttribute("item") Faq faq, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String saveFaq(@RequestParam(required = false) Long id,
+                          @RequestParam String question,
+                          @RequestParam String answer,
+                          @RequestParam String category,
+                          @RequestParam(name = "active", defaultValue = "false") boolean active,
+                          Model model,
+                          RedirectAttributes redirectAttributes) {
+        Faq faq = id == null ? new Faq() : faqRepository.findById(id).orElseThrow();
         try {
-            if (bindingResult.hasErrors()) return faqFormError(model, faq, bindingMessage("FAQ", bindingResult));
-            validateFaq(faq);
+            if (isBlank(question)) throw new IllegalArgumentException("La pregunta de la FAQ es obligatoria.");
+            if (isBlank(answer)) throw new IllegalArgumentException("La respuesta de la FAQ es obligatoria.");
+            if (!FAQ_CATEGORIES.contains(category)) throw new IllegalArgumentException("Selecciona una categoría de FAQ válida.");
+            faq.setQuestion(question.trim());
+            faq.setAnswer(answer.trim());
+            faq.setCategory(category);
+            faq.setActive(active);
             faqRepository.save(faq);
             redirectAttributes.addFlashAttribute("success", "FAQ guardada correctamente.");
             return "redirect:/admin/faqs";
         } catch (RuntimeException exception) {
-            return faqFormError(model, faq, "No se pudo guardar la FAQ: " + safeError(exception));
+            return faqForm(model, faq, "No se pudo guardar la FAQ: " + friendly(exception));
         }
     }
 
@@ -445,15 +604,78 @@ public class AdminController {
         return adminExportService.pdf(adminExportService.timestampedName(data.filename()), data.title(), data.headers(), data.rows());
     }
 
+    /** Construye y devuelve formulario de usuario con error opcional. */
+    private String userFormError(Model model, AdminUserForm user, String error) {
+        model.addAttribute("item", user);
+        model.addAttribute("error", error);
+        return "admin/user-form";
+    }
+
+    /** Construye y devuelve formulario de jugador con error opcional. */
+    private String playerForm(Model model, AdminPlayerForm player, String error) {
+        model.addAttribute("item", player);
+        addPlayerFormOptions(model, player);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/player-form";
+    }
+
+    /** Construye y devuelve formulario de partido con error opcional. */
+    private String matchForm(Model model, AdminMatchForm match, String error) {
+        model.addAttribute("item", match);
+        addMatchFormOptions(model);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/match-form";
+    }
+
+    /** Construye y devuelve formulario de producto con error opcional. */
+    private String productForm(Model model, Product product, String error) {
+        model.addAttribute("item", product);
+        addProductFormOptions(model);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/product-form";
+    }
+
+    /** Construye y devuelve formulario de punto de mapa con error opcional. */
+    private String mapPointForm(Model model, MapPoint point, String error) {
+        model.addAttribute("item", point);
+        addMapPointFormOptions(model);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/map-point-form";
+    }
+
+    /** Construye y devuelve formulario de sensor con error opcional. */
+    private String sensorForm(Model model, SensorReading sensor, String error) {
+        model.addAttribute("item", sensor);
+        addSensorFormOptions(model);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/sensor-form";
+    }
+
+    /** Construye y devuelve formulario de FAQ con error opcional. */
+    private String faqForm(Model model, Faq faq, String error) {
+        model.addAttribute("item", faq);
+        model.addAttribute("faqCategories", FAQ_CATEGORIES);
+        if (error != null) model.addAttribute("error", error);
+        return "admin/faq-form";
+    }
+
     /** Añade opciones auxiliares al formulario de jugador. */
-    private void addPlayerFormOptions(Model model, Player current) {
+    private void addPlayerFormOptions(Model model, AdminPlayerForm current) {
+        Long currentId = parseIdOrNull(current.getId());
+        Integer currentDorsal = parseIntegerOrNull(current.getDorsal());
         List<Integer> used = playerRepository.findAll().stream()
-            .filter(player -> current.getId() == null || !player.getId().equals(current.getId()))
+            .filter(player -> currentId == null || !player.getId().equals(currentId))
             .map(Player::getDorsal)
             .toList();
         List<Integer> available = new ArrayList<>();
         for (int dorsal = 1; dorsal <= 99; dorsal++) {
-            if (!used.contains(dorsal) || (current.getDorsal() != null && current.getDorsal().equals(dorsal))) available.add(dorsal);
+            if (!used.contains(dorsal) || (currentDorsal != null && currentDorsal.equals(dorsal))) {
+                available.add(dorsal);
+            }
+        }
+        if (currentDorsal != null && currentDorsal >= 1 && currentDorsal <= 99 && !available.contains(currentDorsal)) {
+            available.add(currentDorsal);
+            available.sort(Integer::compareTo);
         }
         model.addAttribute("availableDorsals", available);
         model.addAttribute("positions", PLAYER_POSITIONS);
@@ -481,205 +703,179 @@ public class AdminController {
         model.addAttribute("sensorStatuses", SENSOR_STATUSES);
     }
 
-    /** Añade opciones auxiliares al formulario de FAQ. */
-    private void addFaqFormOptions(Model model) {
-        model.addAttribute("faqCategories", FAQ_CATEGORIES);
+    /** Comprueba si un dorsal ya está ocupado por otro jugador. */
+    private boolean isDorsalInUse(Integer dorsal, Long currentId) {
+        return currentId == null ? playerRepository.existsByDorsal(dorsal) : playerRepository.existsByDorsalAndIdNot(dorsal, currentId);
     }
 
-    /** Devuelve el formulario de usuario con error específico. */
-    private String userFormError(Model model, AppUser user, String error) {
-        model.addAttribute("item", user);
-        model.addAttribute("error", error);
-        return "admin/user-form";
+    /** Lee el formulario multipart de jugador dentro del try/catch del controlador. */
+    private AdminPlayerForm readPlayerForm(HttpServletRequest request) {
+        return AdminPlayerForm.builder()
+            .id(request.getParameter("id"))
+            .dorsal(request.getParameter("dorsal"))
+            .name(request.getParameter("name"))
+            .position(request.getParameter("position"))
+            .nationality(request.getParameter("nationality"))
+            .status(request.getParameter("status"))
+            .age(request.getParameter("age"))
+            .height(request.getParameter("height"))
+            .weight(request.getParameter("weight"))
+            .goals(request.getParameter("goals"))
+            .assists(request.getParameter("assists"))
+            .description(request.getParameter("description"))
+            .imageUrl(request.getParameter("imageUrl"))
+            .build();
     }
 
-    /** Devuelve el formulario de jugador con error específico. */
-    private String playerFormError(Model model, Player player, String error) {
-        model.addAttribute("item", player);
-        addPlayerFormOptions(model, player);
-        model.addAttribute("error", error);
-        return "admin/player-form";
+    /** Lee el formulario multipart de partido dentro del try/catch del controlador. */
+    private AdminMatchForm readMatchForm(HttpServletRequest request) {
+        return AdminMatchForm.builder()
+            .id(request.getParameter("id"))
+            .rival(request.getParameter("rival"))
+            .competition(request.getParameter("competition"))
+            .matchDateValue(request.getParameter("matchDateValue"))
+            .stadium(request.getParameter("stadium"))
+            .basePrice(request.getParameter("basePrice"))
+            .availableTickets(request.getParameter("availableTickets"))
+            .status(request.getParameter("status"))
+            .homeGame(!"false".equalsIgnoreCase(request.getParameter("homeGame")))
+            .imageUrl(request.getParameter("imageUrl"))
+            .build();
     }
 
-    /** Devuelve el formulario de partido con error específico. */
-    private String matchFormError(Model model, FootballMatch match, String error) {
-        model.addAttribute("item", match);
-        addMatchFormOptions(model);
-        model.addAttribute("error", error);
-        return "admin/match-form";
+    /** Obtiene un archivo de una petición multipart ya envuelta por Spring MVC. */
+    private MultipartFile multipartFile(HttpServletRequest request, String fieldName) {
+        if (request instanceof MultipartHttpServletRequest multipartRequest) {
+            return multipartRequest.getFile(fieldName);
+        }
+        return null;
     }
 
-    /** Devuelve el formulario de producto con error específico. */
-    private String productFormError(Model model, Product product, String error) {
-        model.addAttribute("item", product);
-        addProductFormOptions(model);
-        model.addAttribute("error", error);
-        return "admin/product-form";
-    }
-
-    /** Devuelve el formulario de punto de mapa con error específico. */
-    private String mapPointFormError(Model model, MapPoint point, String error) {
-        model.addAttribute("item", point);
-        addMapPointFormOptions(model);
-        model.addAttribute("error", error);
-        return "admin/map-point-form";
-    }
-
-    /** Devuelve el formulario de sensor con error específico. */
-    private String sensorFormError(Model model, SensorReading sensor, String error) {
-        model.addAttribute("item", sensor);
-        addSensorFormOptions(model);
-        model.addAttribute("error", error);
-        return "admin/sensor-form";
-    }
-
-    /** Devuelve el formulario de FAQ con error específico. */
-    private String faqFormError(Model model, Faq faq, String error) {
-        model.addAttribute("item", faq);
-        addFaqFormOptions(model);
-        model.addAttribute("error", error);
-        return "admin/faq-form";
-    }
-
-    /** Valida campos obligatorios y reglas de jugador. */
-    private void validatePlayer(Player player) {
-        if (player.getName() == null || player.getName().isBlank()) throw new IllegalArgumentException("El nombre del jugador es obligatorio.");
-        if (player.getDorsal() == null || player.getDorsal() < 1 || player.getDorsal() > 99) throw new IllegalArgumentException("Selecciona un dorsal disponible entre 1 y 99.");
-        if (!PLAYER_POSITIONS.contains(player.getPosition())) throw new IllegalArgumentException("La posición seleccionada no es válida.");
-        if (!PLAYER_STATUSES.contains(player.getStatus())) throw new IllegalArgumentException("El estado seleccionado no es válido.");
-        if (player.getNationality() == null || player.getNationality().isBlank()) throw new IllegalArgumentException("La nacionalidad es obligatoria.");
-        boolean duplicatedDorsal = playerRepository.findAll().stream()
-            .anyMatch(existing -> existing.getDorsal() != null && existing.getDorsal().equals(player.getDorsal()) && (player.getId() == null || !existing.getId().equals(player.getId())));
-        if (duplicatedDorsal) throw new IllegalArgumentException("El dorsal " + player.getDorsal() + " ya está asignado a otro jugador.");
-    }
-
-    /** Valida campos obligatorios y reglas de partido. */
-    private void validateMatch(FootballMatch match) {
-        if (match.getRival() == null || match.getRival().isBlank()) throw new IllegalArgumentException("El rival es obligatorio.");
-        if (!COMPETITIONS.contains(match.getCompetition())) throw new IllegalArgumentException("La competición debe ser LaLiga Hypermotion o Copa del Rey.");
-        if (match.getMatchDate() == null) throw new IllegalArgumentException("La fecha y hora del partido son obligatorias.");
-        if (match.getBasePrice() == null || match.getBasePrice().compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("El precio base no puede ser negativo.");
-        if (match.getAvailableTickets() == null || match.getAvailableTickets() < 0) throw new IllegalArgumentException("Las entradas disponibles no pueden ser negativas.");
-    }
-
-    /** Valida campos obligatorios y reglas de producto. */
-    private void validateProduct(Product product) {
-        if (product.getName() == null || product.getName().isBlank()) throw new IllegalArgumentException("El nombre del producto es obligatorio.");
-        if (!PRODUCT_CATEGORIES.contains(product.getCategory())) throw new IllegalArgumentException("La categoría del producto no es válida.");
-        if (product.getPrice() == null || product.getPrice().compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("El precio no puede ser negativo.");
-        if (product.getStock() == null || product.getStock() < 0) throw new IllegalArgumentException("El stock no puede ser negativo.");
-    }
-
-    /** Valida campos obligatorios y reglas de punto de mapa. */
-    private void validateMapPoint(MapPoint point) {
-        if (point.getName() == null || point.getName().isBlank()) throw new IllegalArgumentException("El nombre del punto es obligatorio.");
-        if (!MAP_POINT_TYPES.contains(point.getType())) throw new IllegalArgumentException("El tipo de punto seleccionado no es válido.");
-        if (point.getLatitude() == null) throw new IllegalArgumentException("La latitud es obligatoria.");
-        if (point.getLongitude() == null) throw new IllegalArgumentException("La longitud es obligatoria.");
-    }
-
-    /** Valida campos obligatorios y reglas de sensor. */
-    private void validateSensor(SensorReading sensor) {
-        if (sensor.getName() == null || sensor.getName().isBlank()) throw new IllegalArgumentException("El nombre del sensor es obligatorio.");
-        if (!SENSOR_TYPES.contains(sensor.getType())) throw new IllegalArgumentException("El tipo de sensor seleccionado no es válido.");
-        if (!SENSOR_STATUSES.contains(sensor.getStatus())) throw new IllegalArgumentException("El estado del sensor seleccionado no es válido.");
-        if (sensor.getValue() == null) throw new IllegalArgumentException("El valor del sensor es obligatorio.");
-        if (sensor.getUnit() == null || sensor.getUnit().isBlank()) throw new IllegalArgumentException("La unidad del sensor es obligatoria.");
-        if (sensor.getLatitude() == null || sensor.getLongitude() == null) throw new IllegalArgumentException("La latitud y longitud son obligatorias.");
-    }
-
-    /** Valida campos obligatorios y reglas de FAQ. */
-    private void validateFaq(Faq faq) {
-        if (faq.getQuestion() == null || faq.getQuestion().isBlank()) throw new IllegalArgumentException("La pregunta de la FAQ es obligatoria.");
-        if (faq.getAnswer() == null || faq.getAnswer().isBlank()) throw new IllegalArgumentException("La respuesta de la FAQ es obligatoria.");
-        if (!FAQ_CATEGORIES.contains(faq.getCategory())) throw new IllegalArgumentException("La categoría seleccionada no es válida.");
-    }
-
-    /** Conserva imagen existente del jugador si se edita sin subir otra. */
-    private void preservePlayerImage(Player player) {
-        if (player.getId() != null && (player.getImageUrl() == null || player.getImageUrl().isBlank())) {
-            playerRepository.findById(player.getId()).ifPresent(existing -> player.setImageUrl(existing.getImageUrl()));
+    /** Parsea el identificador oculto del formulario. */
+    private Long parseId(String value, String entityName) {
+        if (isBlank(value)) return null;
+        try {
+            return Long.valueOf(value.trim());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("El identificador de " + entityName + " no es válido.");
         }
     }
 
-    /** Conserva escudo existente del partido si se edita sin subir otro. */
-    private void preserveMatchImage(FootballMatch match) {
-        if (match.getId() != null && (match.getImageUrl() == null || match.getImageUrl().isBlank())) {
-            matchRepository.findById(match.getId()).ifPresent(existing -> match.setImageUrl(existing.getImageUrl()));
+    /** Parsea un identificador sin lanzar excepción para reconstruir listas de opciones. */
+    private Long parseIdOrNull(String value) {
+        try {
+            return parseId(value, "registro");
+        } catch (RuntimeException exception) {
+            return null;
         }
     }
 
-    /** Conserva imagen existente del producto si se edita sin subir otra. */
-    private void preserveProductImage(Product product) {
-        if (product.getId() != null && (product.getImageUrl() == null || product.getImageUrl().isBlank())) {
-            productRepository.findById(product.getId()).ifPresent(existing -> product.setImageUrl(existing.getImageUrl()));
+    /** Parsea un entero sin lanzar excepción para reconstruir listas de opciones. */
+    private Integer parseIntegerOrNull(String value) {
+        try {
+            return parseInteger(value, "valor", false);
+        } catch (RuntimeException exception) {
+            return null;
         }
     }
 
-    /** Normaliza datos de jugador antes de persistir. */
-    private void normalizePlayer(Player player) {
-        if (player.getStatus() == null || player.getStatus().isBlank()) player.setStatus("DISPONIBLE");
-        if (player.getPosition() == null || player.getPosition().isBlank()) player.setPosition("Delantero");
-        if (player.getNationality() == null || player.getNationality().isBlank()) player.setNationality("España");
-        if (player.getGoals() == null) player.setGoals(0);
-        if (player.getAssists() == null) player.setAssists(0);
-        if (player.getImageUrl() == null || player.getImageUrl().isBlank()) player.setImageUrl("/images/avatar.svg");
+    /** Localiza jugador con mensaje apto para formulario. */
+    private Player findPlayer(Long id) {
+        return playerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe el jugador indicado."));
     }
 
-    /** Normaliza datos de partido antes de persistir. */
-    private void normalizeMatch(FootballMatch match) {
-        if (match.getImageUrl() == null || match.getImageUrl().isBlank()) match.setImageUrl("/images/team-default-shield.svg");
-        if (match.getHomeGame() == null) match.setHomeGame(true);
-        if (match.getStatus() == null || match.getStatus().isBlank()) match.setStatus("PROGRAMADO");
-        if (match.getStadium() == null || match.getStadium().isBlank()) match.setStadium(Boolean.FALSE.equals(match.getHomeGame()) ? "Estadio rival" : "El Plantío");
-        if (match.getAvailableTickets() == null) match.setAvailableTickets(0);
-        if (match.getBasePrice() == null) match.setBasePrice(BigDecimal.ZERO);
+    /** Localiza partido con mensaje apto para formulario. */
+    private FootballMatch findMatch(Long id) {
+        return matchRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe el partido indicado."));
     }
 
-    /** Normaliza datos de producto antes de persistir. */
-    private void normalizeProduct(Product product) {
-        if (product.getPrice() == null) product.setPrice(BigDecimal.ZERO);
-        if (product.getStock() == null) product.setStock(0);
-        if (product.getCategory() == null || product.getCategory().isBlank()) product.setCategory("Textil");
-        if (product.getImageUrl() == null || product.getImageUrl().isBlank()) product.setImageUrl("/images/product.svg");
+    /** Comprueba si el correo ya pertenece a otro usuario. */
+    private boolean isEmailInUse(String email, Long currentId) {
+        return currentId == null ? userService.existsByEmail(email) : userService.existsByEmailAndIdNot(email, currentId);
     }
 
-    /** Comprueba si el input contiene un fichero real. */
-    private boolean hasFile(MultipartFile file) {
-        return file != null && !file.isEmpty();
+    /** Normaliza correo electrónico para comparar y persistir. */
+    private String normalizeEmail(String email) {
+        return isBlank(email) ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    /** Parsea un entero enviado como texto desde formularios administrativos. */
+    private Integer parseInteger(String value, String fieldName, boolean required) {
+        if (isBlank(value)) {
+            if (required) throw new IllegalArgumentException("El campo " + fieldName + " es obligatorio.");
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("El campo " + fieldName + " debe ser un número entero válido.");
+        }
+    }
+
+    /** Parsea un decimal enviado como texto desde formularios administrativos. */
+    private BigDecimal parseBigDecimal(String value, String fieldName, boolean required) {
+        if (isBlank(value)) {
+            if (required) throw new IllegalArgumentException("El campo " + fieldName + " es obligatorio.");
+            return null;
+        }
+        try {
+            return new BigDecimal(value.trim().replace(",", "."));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("El campo " + fieldName + " debe ser un número válido.");
+        }
     }
 
     /** Guarda físicamente una imagen subida desde administración. */
     private String storeUploadedImage(MultipartFile file, String folder, String prefix) throws IOException {
-        if (!hasFile(file)) return null;
-        if (file.getSize() > MAX_IMAGE_BYTES) throw new IllegalArgumentException("La imagen supera el máximo permitido de 64MB. Selecciona una imagen más ligera.");
+        if (file == null || file.isEmpty()) return null;
+        if (file.getSize() > MAX_IMAGE_BYTES) throw new IllegalArgumentException("La imagen supera el máximo permitido de 64MB.");
         String originalName = file.getOriginalFilename() == null ? prefix + ".png" : file.getOriginalFilename();
         String extension = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')).toLowerCase(Locale.ROOT) : "";
         if (!extension.matches("\\.(png|jpg|jpeg|webp|svg)")) throw new IllegalArgumentException("Formato de imagen no permitido. Usa PNG, JPG, JPEG, WEBP o SVG.");
         Path directory = Path.of("uploads", folder);
         Files.createDirectories(directory);
         String filename = prefix + "-" + UUID.randomUUID() + extension;
-        try {
-            Files.copy(file.getInputStream(), directory.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException exception) {
-            throw new IOException("No se pudo guardar la imagen en disco. Revisa el volumen de uploads o los permisos del contenedor.", exception);
-        }
+        Files.copy(file.getInputStream(), directory.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
         return "/uploads/" + folder + "/" + filename;
     }
 
-    /** Crea un mensaje legible para errores de binding. */
-    private String bindingMessage(String entity, BindingResult bindingResult) {
-        return bindingResult.getFieldErrors().stream()
-            .findFirst()
-            .map(error -> "Revisa el campo '" + error.getField() + "' del " + entity + ". Valor no válido: " + String.valueOf(error.getRejectedValue()))
-            .orElse("Revisa los campos del formulario de " + entity + ".");
+    /** Parsea fecha HTML datetime-local con error específico. */
+    private LocalDateTime parseHtmlDateTime(String value) {
+        if (isBlank(value)) throw new IllegalArgumentException("La fecha y hora del partido son obligatorias.");
+        try {
+            return LocalDateTime.parse(value.trim(), HTML_DATETIME);
+        } catch (DateTimeParseException exception) {
+            throw new IllegalArgumentException("La fecha y hora del partido no tienen un formato válido.");
+        }
     }
 
-    /** Limpia mensajes de error para mostrarlos al usuario. */
-    private String safeError(Exception exception) {
-        if (exception.getMessage() == null || exception.getMessage().isBlank()) return "revisa los campos del formulario.";
-        return exception.getMessage();
+    /** Distingue excepciones de multipart de otros IllegalStateException. */
+    private boolean isMultipartFailure(Exception exception) {
+        String message = exception.getMessage();
+        if (message == null) return false;
+        String lower = message.toLowerCase(Locale.ROOT);
+        return lower.contains("multipart")
+            || lower.contains("multi-part")
+            || lower.contains("parts")
+            || lower.contains("size")
+            || lower.contains("request body")
+            || lower.contains("too large");
     }
+
+    /** Limpia mensajes técnicos para mostrarlos al usuario. */
+    private String friendly(Exception exception) {
+        if (exception.getMessage() == null || exception.getMessage().isBlank()) return "revisa los campos del formulario.";
+        String message = exception.getMessage();
+        if (message.contains("Duplicate entry") || message.contains("constraint") || message.contains("uk_players_dorsal")) return "ya existe un registro con esos datos únicos.";
+        if (message.contains("Failed to convert") || message.contains("typeMismatch")) return "revisa los valores numéricos y de fecha.";
+        return message;
+    }
+
+    /** Comprueba cadena vacía. */
+    private boolean isBlank(String value) { return value == null || value.isBlank(); }
+
+    /** Convierte vacío a null. */
+    private String emptyToNull(String value) { return isBlank(value) ? null : value.trim(); }
 
     /** Construye los datos exportables de cada sección. */
     private ExportData exportData(String section) {
@@ -707,14 +903,10 @@ public class AdminController {
     }
 
     /** Convierte valores nulos a texto vacío. */
-    private String value(Object value) {
-        return value == null ? "" : String.valueOf(value);
-    }
+    private String value(Object value) { return value == null ? "" : String.valueOf(value); }
 
     /** Formatea fechas nulas o no nulas. */
-    private String date(LocalDateTime date) {
-        return date == null ? "" : date.format(DATE_FORMAT);
-    }
+    private String date(LocalDateTime date) { return date == null ? "" : date.format(DATE_FORMAT); }
 
     /** Datos de exportación de una sección administrativa. */
     private record ExportData(String filename, String title, List<String> headers, List<List<String>> rows) { }

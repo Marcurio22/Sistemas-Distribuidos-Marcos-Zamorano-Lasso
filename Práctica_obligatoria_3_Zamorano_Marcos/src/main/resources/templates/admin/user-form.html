@@ -15,7 +15,7 @@
         <div class="admin-form-heading">
             <p>Administración</p>
             <h1>Usuario</h1>
-            <span>Gestiona datos de perfil, rol y estado de la cuenta. Las contraseñas no son editables desde administración.</span>
+            <span>Gestiona identidad, rol y estado. Las contraseñas no son visibles ni editables desde administración.</span>
         </div>
         <form th:action="@{/admin/users}" th:object="${item}" method="post" class="admin-form-grid">
             <input type="hidden" th:field="*{id}">
@@ -31,10 +31,6 @@
             <div class="md:col-span-2">
                 <label class="field-label">Correo electrónico</label>
                 <input class="input input-bordered w-full" th:field="*{email}" type="email" required placeholder="usuario@plantio360.local">
-            </div>
-            <div class="md:col-span-2 admin-info-card">
-                <strong>Contraseña gestionada por el sistema</strong>
-                <small>El administrador no puede consultar ni modificar contraseñas. Al crear un usuario manualmente se asigna la contraseña temporal <code>user1234</code>, siempre almacenada hasheada con BCrypt.</small>
             </div>
             <div>
                 <label class="field-label">Teléfono</label>

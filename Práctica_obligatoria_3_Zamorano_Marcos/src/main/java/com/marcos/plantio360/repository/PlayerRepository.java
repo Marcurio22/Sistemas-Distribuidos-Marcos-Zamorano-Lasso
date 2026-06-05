@@ -13,4 +13,10 @@ import java.util.List;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     /** Devuelve jugadores ordenados por dorsal. */
     List<Player> findAllByOrderByDorsalAsc();
+
+    /** Comprueba si un dorsal ya está asignado. */
+    boolean existsByDorsal(Integer dorsal);
+
+    /** Comprueba si un dorsal está asignado a otro jugador distinto del indicado. */
+    boolean existsByDorsalAndIdNot(Integer dorsal, Long id);
 }

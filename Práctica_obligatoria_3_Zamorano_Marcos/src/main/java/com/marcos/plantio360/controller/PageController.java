@@ -157,8 +157,8 @@ public class PageController {
     /** Fuerza sincronización manual de sensores desde Flask. */
     @PostMapping("/sensors/sync")
     public String syncSensors(RedirectAttributes redirectAttributes) {
-        sensorService.syncFromPythonApi();
-        redirectAttributes.addFlashAttribute("success", "Sensores sincronizados desde Flask.");
+        int count = sensorService.syncFromPythonApi().size();
+        redirectAttributes.addFlashAttribute("success", "Sensores sincronizados desde Flask: " + count + " lecturas disponibles en el visor.");
         return "redirect:/map";
     }
 }

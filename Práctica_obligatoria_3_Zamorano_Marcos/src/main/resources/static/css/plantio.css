@@ -582,15 +582,3 @@ body::after {
     .admin-form-actions { flex-direction: column; }
     .admin-form-actions .btn { width: 100%; }
 }
-
-/* Admin informational panels and refined form feedback. */
-.admin-info-card {
-    border-radius: 18px;
-    border: 1px solid rgba(47,139,63,.18);
-    background: linear-gradient(135deg, #eefaf0, #f8fafc);
-    padding: 1rem 1.1rem;
-    box-shadow: 0 10px 24px rgba(15,23,42,.05);
-}
-.admin-info-card strong { display:block; color: var(--plantio-ink); font-weight: 950; }
-.admin-info-card small { display:block; color:#475569; margin-top:.25rem; line-height:1.55; }
-.admin-info-card code { background:#e2f5e7; color:var(--plantio-green-dark); padding:.1rem .35rem; border-radius:.45rem; font-weight:900; }

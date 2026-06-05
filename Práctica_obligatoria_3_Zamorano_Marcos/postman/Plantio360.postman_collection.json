@@ -1,68 +1,506 @@
 {
   "info": {
-    "name": "El Plantío 360",
-    "description": "Colección Postman para la práctica de Marcos Zamorano Lasso.",
+    "name": "El Plantío 360 - API completa",
+    "description": "Colección Postman actualizada para verificar JWT, catálogo, sensores Flask, compras, RabbitMQ/MailHog, asistente IA y endpoints privados. Autor: Marcos Zamorano Lasso.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Auth - Login",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\n  \"email\": \"admin@plantio360.local\",\n  \"password\": \"admin1234\"\n}"},
-        "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]}
-      }
+      "name": "01 Auth",
+      "item": [
+        {
+          "name": "Login admin - guardar JWT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('jwt', json.token);",
+                  "pm.test('Login correcto', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@plantio360.local\",\n  \"password\": \"admin1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login usuario - guardar JWT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('jwt', json.token);",
+                  "pm.test('Login correcto', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@plantio360.local\",\n  \"password\": \"user1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registro REST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Postman\",\n  \"lastName\": \"Tester\",\n  \"email\": \"postman{{$timestamp}}@plantio360.local\",\n  \"phone\": \"600000000\",\n  \"password\": \"user1234\",\n  \"confirmPassword\": \"user1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Catalog - Players",
-      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/players", "host": ["{{baseUrl}}"], "path": ["api", "players"]}}
+      "name": "02 Catálogo público",
+      "item": [
+        {
+          "name": "Jugadores",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/players",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "players"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Partidos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "matches"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Productos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Puntos de mapa",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/map-points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "map-points"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sensores guardados en Spring/MySQL",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/sensors/latest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sensors",
+                "latest"
+              ]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Catalog - Matches",
-      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/matches", "host": ["{{baseUrl}}"], "path": ["api", "matches"]}}
+      "name": "03 Flask / Remote sensing",
+      "item": [
+        {
+          "name": "Flask health directo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{flaskUrl}}/health",
+              "host": [
+                "{{flaskUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Flask sensores directo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{flaskUrl}}/api/sensors",
+              "host": [
+                "{{flaskUrl}}"
+              ],
+              "path": [
+                "api",
+                "sensors"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Spring sincroniza sensores desde Flask",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/sensors/sync",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sensors",
+                "sync"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Comprobar sensores persistidos tras sincronizar",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/sensors/latest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sensors",
+                "latest"
+              ]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Catalog - Products",
-      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/products", "host": ["{{baseUrl}}"], "path": ["api", "products"]}}
+      "name": "04 Asistente IA",
+      "item": [
+        {
+          "name": "Preguntar al asistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"¿Qué stock hay ahora mismo en la tienda?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/assistant",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assistant"
+              ]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Map - Points",
-      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/map-points", "host": ["{{baseUrl}}"], "path": ["api", "map-points"]}}
+      "name": "05 Checkout / RabbitMQ / MailHog",
+      "item": [
+        {
+          "name": "Comprar producto - genera pedido, RabbitMQ y email MailHog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PRODUCT\",\n  \"itemId\": 1,\n  \"quantity\": 1,\n  \"cardHolder\": \"Marcos Zamorano\",\n  \"cardNumber\": \"4242424242424242\",\n  \"expiry\": \"12/30\",\n  \"cvv\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Comprar entrada - genera ticket, RabbitMQ y email MailHog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TICKET\",\n  \"itemId\": 1,\n  \"zone\": \"Lateral\",\n  \"cardHolder\": \"Marcos Zamorano\",\n  \"cardNumber\": \"4242424242424242\",\n  \"expiry\": \"12/30\",\n  \"cvv\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mis pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/me/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "me",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mis entradas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/me/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "me",
+                "tickets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Abrir MailHog en navegador",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{mailhogUrl}}",
+              "host": [
+                "{{mailhogUrl}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "RabbitMQ management en navegador",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{rabbitUrl}}",
+              "host": [
+                "{{rabbitUrl}}"
+              ]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Sensors - Sync Flask",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}],
-        "url": {"raw": "{{baseUrl}}/api/sensors/sync", "host": ["{{baseUrl}}"], "path": ["api", "sensors", "sync"]}
-      }
-    },
-    {
-      "name": "Assistant - Ask",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{jwt}}"}],
-        "body": {"mode": "raw", "raw": "{\n  \"question\": \"¿Dónde puedo aparcar?\"\n}"},
-        "url": {"raw": "{{baseUrl}}/api/assistant", "host": ["{{baseUrl}}"], "path": ["api", "assistant"]}
-      }
-    },
-    {
-      "name": "Checkout - Buy Product",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{jwt}}"}],
-        "body": {"mode": "raw", "raw": "{\n  \"type\": \"PRODUCT\",\n  \"itemId\": 1,\n  \"quantity\": 1,\n  \"cardHolder\": \"Marcos Zamorano\",\n  \"cardNumber\": \"4242424242424242\",\n  \"expiry\": \"12/30\",\n  \"cvv\": \"123\"\n}"},
-        "url": {"raw": "{{baseUrl}}/api/checkout", "host": ["{{baseUrl}}"], "path": ["api", "checkout"]}
-      }
-    },
-    {
-      "name": "Me - Orders",
-      "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}], "url": {"raw": "{{baseUrl}}/api/me/orders", "host": ["{{baseUrl}}"], "path": ["api", "me", "orders"]}}
+      "name": "06 Health / Infraestructura",
+      "item": [
+        {
+          "name": "Spring Actuator Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "SonarQube navegador",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{sonarUrl}}",
+              "host": [
+                "{{sonarUrl}}"
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
-    {"key": "baseUrl", "value": "http://localhost:8080"},
-    {"key": "jwt", "value": ""}
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8080"
+    },
+    {
+      "key": "flaskUrl",
+      "value": "http://127.0.0.1:5000"
+    },
+    {
+      "key": "mailhogUrl",
+      "value": "http://127.0.0.1:8025"
+    },
+    {
+      "key": "rabbitUrl",
+      "value": "http://127.0.0.1:15672"
+    },
+    {
+      "key": "sonarUrl",
+      "value": "http://127.0.0.1:9000"
+    },
+    {
+      "key": "jwt",
+      "value": ""
+    }
   ]
 }
