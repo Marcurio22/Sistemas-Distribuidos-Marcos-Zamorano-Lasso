@@ -1,17 +1,18 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Administración de pedidos.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Pedidos')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>Pedidos</h1><table class="table table-zebra"><thead><tr><th>Referencia</th><th>Usuario</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.paymentReference}"></td><td th:text="${item.user.email}"></td><td th:text="${item.total}"></td><td th:text="${item.status}"></td><td th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm')}"></td></tr></tbody></table>
+    <div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
+    <div class="section-title admin-list-title"><div><p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Administración</p><h1 class="text-4xl font-black tracking-tight">Pedidos</h1></div><div class="admin-actions"><a class="btn btn-outline btn-success admin-export-btn" th:href="@{/admin/orders/export.csv}"><span class="admin-export-icon">▣</span>Exportar CSV</a><a class="btn btn-outline btn-error admin-export-btn" th:href="@{/admin/orders/export.pdf}"><span class="admin-export-icon">▤</span>Exportar PDF</a></div></div>
+    <div class="overflow-x-auto rounded-3xl bg-white/90 shadow-xl border border-slate-200"><table class="table table-zebra admin-table"><thead><tr><th>Referencia</th><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.paymentReference}"></td><td th:text="${item.user.email}"></td><td th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm')}"></td><td><span class="badge badge-success" th:text="${item.status}"></span></td><td th:text="${item.total} + ' €'"></td></tr></tbody></table></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

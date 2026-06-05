@@ -1,17 +1,18 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Administración de jugadores.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Jugadores')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<div class="section-title"><h1>Jugadores</h1><a class="btn btn-primary" th:href="@{/admin/players/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Dorsal</th><th>Nombre</th><th>Posición</th><th>Estado</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.dorsal}"></td><td th:text="${item.name}"></td><td th:text="${item.position}"></td><td th:text="${item.status}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/players/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+    <div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
+    <div class="section-title admin-list-title"><div><p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Administración</p><h1 class="text-4xl font-black tracking-tight">Jugadores</h1></div><div class="admin-actions"><a class="btn btn-outline btn-success admin-export-btn" th:href="@{/admin/players/export.csv}"><span class="admin-export-icon">▣</span>Exportar CSV</a><a class="btn btn-outline btn-error admin-export-btn" th:href="@{/admin/players/export.pdf}"><span class="admin-export-icon">▤</span>Exportar PDF</a><a class="btn btn-primary" th:href="@{/admin/players/new}">Nuevo</a></div></div>
+    <div class="overflow-x-auto rounded-3xl bg-white/90 shadow-xl border border-slate-200"><table class="table table-zebra admin-table"><thead><tr><th>Dorsal</th><th>Nombre</th><th>Posición</th><th>Estado</th><th>Acciones</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.dorsal}"></td><td th:text="${item.name}"></td><td th:text="${item.position}"></td><td><span class="badge badge-outline" th:text="${item.status}"></span></td><td class="admin-row-actions"><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/players/{id}/edit(id=${item.id})}">Editar</a><form th:action="@{/admin/players/{id}/delete(id=${item.id})}" method="post" data-confirm="¿Eliminar jugador?"><button class="btn btn-sm btn-outline btn-error" type="submit">Eliminar</button></form></td></tr></tbody></table></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

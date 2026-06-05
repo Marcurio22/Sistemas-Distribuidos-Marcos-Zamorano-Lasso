@@ -1,17 +1,48 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Formulario de FAQ.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · FAQ')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>FAQ</h1><form th:action="@{/admin/faqs}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Pregunta</label><input class="input input-bordered w-full mb-2" th:field="*{question}"><label>Respuesta</label><textarea class="textarea textarea-bordered w-full mb-2" th:field="*{answer}"></textarea><label>Categoría</label><input class="input input-bordered w-full mb-2" th:field="*{category}"><div class="flex items-center gap-3 mb-3"><input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}"><label class="font-semibold text-slate-700">Activa</label></div><button class="btn btn-primary">Guardar</button></form>
+    <div th:replace="~{fragments/common :: backLink('/admin/faqs', 'Volver a FAQs')}"></div>
+    <section class="admin-form-card max-w-5xl">
+        <div class="admin-form-heading">
+            <p>Administración</p>
+            <h1>FAQ</h1>
+            <span>Pregunta frecuente usada por Blanquinegro Bot antes de consultar Gemini.</span>
+        </div>
+        <form th:action="@{/admin/faqs}" th:object="${item}" method="post" class="admin-form-grid">
+            <input type="hidden" th:field="*{id}">
+            <div class="md:col-span-2">
+                <label class="field-label">Pregunta</label>
+                <input class="input input-bordered w-full" th:field="*{question}" required placeholder="¿Cómo compro una entrada?">
+            </div>
+            <div class="md:col-span-2">
+                <label class="field-label">Respuesta</label>
+                <textarea class="textarea textarea-bordered w-full min-h-40" th:field="*{answer}" required placeholder="Respuesta que verá el usuario"></textarea>
+            </div>
+            <div>
+                <label class="field-label">Categoría</label>
+                <select class="select select-bordered w-full" th:field="*{category}" required>
+                    <option th:each="category : ${faqCategories}" th:value="${category}" th:text="${category}">General</option>
+                </select>
+            </div>
+            <label class="admin-check-card">
+                <input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}">
+                <span><strong>FAQ activa</strong><small>Disponible para el asistente IA.</small></span>
+            </label>
+            <div class="admin-form-actions md:col-span-2">
+                <a class="btn btn-outline btn-primary" th:href="@{/admin/faqs}">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar FAQ</button>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

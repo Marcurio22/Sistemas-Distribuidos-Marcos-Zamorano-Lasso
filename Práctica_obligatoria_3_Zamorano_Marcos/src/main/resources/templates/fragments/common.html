@@ -72,7 +72,7 @@
         </ul>
     </div>
     <div class="navbar-end gap-2">
-        <a sec:authorize="!isAuthenticated()" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-plantio-ink" th:href="@{/login}">Login</a>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-outline btn-sm text-white border-white plantio-nav-user-btn" th:href="@{/login}">Login</a>
         <a sec:authorize="!isAuthenticated()" class="btn btn-primary btn-sm" th:href="@{/register}">Registro</a>
         <a sec:authorize="isAuthenticated()" class="btn btn-outline btn-sm text-white border-white plantio-nav-user-btn" th:href="@{/dashboard}">Mi espacio</a>
         <a sec:authorize="isAuthenticated()" class="btn btn-error btn-sm" th:href="@{/logout}">Logout</a>

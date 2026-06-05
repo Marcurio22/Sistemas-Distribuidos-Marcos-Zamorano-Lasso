@@ -1,17 +1,18 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Administración de productos.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Productos')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<div class="section-title"><h1>Productos</h1><a class="btn btn-primary" th:href="@{/admin/products/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Nombre</th><th>Precio</th><th>Stock</th><th>Activo</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.price}"></td><td th:text="${item.stock}"></td><td th:text="${item.active}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/products/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+    <div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
+    <div class="section-title admin-list-title"><div><p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Administración</p><h1 class="text-4xl font-black tracking-tight">Productos</h1></div><div class="admin-actions"><a class="btn btn-outline btn-success admin-export-btn" th:href="@{/admin/products/export.csv}"><span class="admin-export-icon">▣</span>Exportar CSV</a><a class="btn btn-outline btn-error admin-export-btn" th:href="@{/admin/products/export.pdf}"><span class="admin-export-icon">▤</span>Exportar PDF</a><a class="btn btn-primary" th:href="@{/admin/products/new}">Nuevo</a></div></div>
+    <div class="overflow-x-auto rounded-3xl bg-white/90 shadow-xl border border-slate-200"><table class="table table-zebra admin-table"><thead><tr><th>Nombre</th><th>Precio</th><th>Stock</th><th>Activo</th><th>Acciones</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.price} + ' €'"></td><td th:text="${item.stock}"></td><td><span class="badge" th:classappend="${item.active} ? ' badge-success' : ' badge-error'" th:text="${item.active} ? 'Sí' : 'No'"></span></td><td class="admin-row-actions"><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/products/{id}/edit(id=${item.id})}">Editar</a><form th:action="@{/admin/products/{id}/delete(id=${item.id})}" method="post" data-confirm="¿Eliminar producto?"><button class="btn btn-sm btn-outline btn-error" type="submit">Eliminar</button></form></td></tr></tbody></table></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

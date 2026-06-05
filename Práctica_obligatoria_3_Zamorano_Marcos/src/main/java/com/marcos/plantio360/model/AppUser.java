@@ -53,7 +53,6 @@ public class AppUser implements Serializable {
     public void prePersist() {
         if (createdAt == null) createdAt = LocalDateTime.now();
         if (role == null || role.isBlank()) role = "ROLE_USER";
-        enabled = true;
     }
 
     /**

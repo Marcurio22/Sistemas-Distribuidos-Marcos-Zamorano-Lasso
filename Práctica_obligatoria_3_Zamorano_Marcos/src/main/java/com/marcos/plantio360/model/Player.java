@@ -52,7 +52,7 @@ public class Player implements Serializable {
      */
     @PrePersist
     public void prePersist() {
-        if (status == null) status = "AVAILABLE";
+        if (status == null) status = "DISPONIBLE";
         if (goals == null) goals = 0;
         if (assists == null) assists = 0;
     }

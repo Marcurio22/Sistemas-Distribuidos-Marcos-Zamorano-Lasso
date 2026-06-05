@@ -1,17 +1,18 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Administración de puntos del mapa.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Puntos mapa')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<div class="section-title"><h1>Puntos del mapa</h1><a class="btn btn-primary" th:href="@{/admin/map-points/new}">Nuevo</a></div><table class="table table-zebra"><thead><tr><th>Nombre</th><th>Tipo</th><th>Lat</th><th>Lon</th><th></th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.type}"></td><td th:text="${item.latitude}"></td><td th:text="${item.longitude}"></td><td><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/map-points/{id}/edit(id=${item.id})}">Editar</a></td></tr></tbody></table>
+    <div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
+    <div class="section-title admin-list-title"><div><p class="uppercase tracking-[.22em] text-sm font-black text-plantio-green">Administración</p><h1 class="text-4xl font-black tracking-tight">Puntos del mapa</h1></div><div class="admin-actions"><a class="btn btn-outline btn-success admin-export-btn" th:href="@{/admin/map-points/export.csv}"><span class="admin-export-icon">▣</span>Exportar CSV</a><a class="btn btn-outline btn-error admin-export-btn" th:href="@{/admin/map-points/export.pdf}"><span class="admin-export-icon">▤</span>Exportar PDF</a><a class="btn btn-primary" th:href="@{/admin/map-points/new}">Nuevo</a></div></div>
+    <div class="overflow-x-auto rounded-3xl bg-white/90 shadow-xl border border-slate-200"><table class="table table-zebra admin-table"><thead><tr><th>Nombre</th><th>Tipo</th><th>Latitud</th><th>Longitud</th><th>Acciones</th></tr></thead><tbody><tr th:each="item : ${items}"><td th:text="${item.name}"></td><td th:text="${item.type}"></td><td th:text="${item.latitude}"></td><td th:text="${item.longitude}"></td><td class="admin-row-actions"><a class="btn btn-sm btn-outline btn-primary" th:href="@{/admin/map-points/{id}/edit(id=${item.id})}">Editar</a><form th:action="@{/admin/map-points/{id}/delete(id=${item.id})}" method="post" data-confirm="¿Eliminar punto del mapa?"><button class="btn btn-sm btn-outline btn-error" type="submit">Eliminar</button></form></td></tr></tbody></table></div>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

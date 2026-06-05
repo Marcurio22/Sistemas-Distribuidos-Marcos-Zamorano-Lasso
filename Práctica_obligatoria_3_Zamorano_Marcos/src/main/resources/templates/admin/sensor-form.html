@@ -1,17 +1,55 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Formulario de sensor.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Sensor')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>Sensor</h1><form th:action="@{/admin/sensors}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{name}"><label>Tipo</label><input class="input input-bordered w-full mb-2" th:field="*{type}"><label>Valor</label><input class="input input-bordered w-full mb-2" th:field="*{value}"><label>Unidad</label><input class="input input-bordered w-full mb-2" th:field="*{unit}"><label>Estado</label><input class="input input-bordered w-full mb-2" th:field="*{status}"><label>Latitud</label><input class="input input-bordered w-full mb-2" th:field="*{latitude}"><label>Longitud</label><input class="input input-bordered w-full mb-3" th:field="*{longitude}"><button class="btn btn-primary">Guardar</button></form>
+    <div th:replace="~{fragments/common :: backLink('/admin/sensors', 'Volver a sensores')}"></div>
+    <section class="admin-form-card">
+        <div class="admin-form-heading">
+            <p>Administración</p>
+            <h1>Sensor</h1>
+            <span>Registra lecturas simuladas de remote sensing para el visor cartográfico.</span>
+        </div>
+        <form th:action="@{/admin/sensors}" th:object="${item}" method="post" class="admin-form-grid">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{capturedAt}">
+            <div class="md:col-span-2">
+                <label class="field-label">Nombre</label>
+                <input class="input input-bordered w-full" th:field="*{name}" required placeholder="Ej: Parking Norte">
+            </div>
+            <div>
+                <label class="field-label">Tipo</label>
+                <select class="select select-bordered w-full" th:field="*{type}">
+                    <option th:each="type : ${sensorTypes}" th:value="${type}" th:text="${type}">PARKING</option>
+                </select>
+            </div>
+            <div>
+                <label class="field-label">Estado</label>
+                <select class="select select-bordered w-full" th:field="*{status}">
+                    <option th:each="status : ${sensorStatuses}" th:value="${status}" th:text="${status}">NORMAL</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3 md:col-span-2">
+                <div><label class="field-label">Valor</label><input class="input input-bordered w-full" th:field="*{value}" type="number" step="0.01" required></div>
+                <div><label class="field-label">Unidad</label><input class="input input-bordered w-full" th:field="*{unit}" placeholder="%" required></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 md:col-span-2">
+                <div><label class="field-label">Latitud</label><input class="input input-bordered w-full" th:field="*{latitude}" type="number" step="0.0000001" required></div>
+                <div><label class="field-label">Longitud</label><input class="input input-bordered w-full" th:field="*{longitude}" type="number" step="0.0000001" required></div>
+            </div>
+            <div class="admin-form-actions md:col-span-2">
+                <a class="btn btn-outline btn-primary" th:href="@{/admin/sensors}">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar sensor</button>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

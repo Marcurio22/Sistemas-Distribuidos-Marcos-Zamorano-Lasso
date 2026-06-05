@@ -1,17 +1,48 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Formulario de punto de mapa.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Punto de mapa')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>Punto del mapa</h1><form th:action="@{/admin/map-points}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{name}"><label>Tipo</label><input class="input input-bordered w-full mb-2" th:field="*{type}"><label>Latitud</label><input class="input input-bordered w-full mb-2" th:field="*{latitude}"><label>Longitud</label><input class="input input-bordered w-full mb-2" th:field="*{longitude}"><label>Descripción</label><textarea class="textarea textarea-bordered w-full mb-3" th:field="*{description}"></textarea><button class="btn btn-primary">Guardar</button></form>
+    <div th:replace="~{fragments/common :: backLink('/admin/map-points', 'Volver a puntos del mapa')}"></div>
+    <section class="admin-form-card">
+        <div class="admin-form-heading">
+            <p>Administración</p>
+            <h1>Punto del mapa</h1>
+            <span>Define puntos de interés que se representarán en el visor Leaflet.</span>
+        </div>
+        <form th:action="@{/admin/map-points}" th:object="${item}" method="post" class="admin-form-grid">
+            <input type="hidden" th:field="*{id}">
+            <div class="md:col-span-2">
+                <label class="field-label">Nombre</label>
+                <input class="input input-bordered w-full" th:field="*{name}" required placeholder="Ej: Parking Norte">
+            </div>
+            <div>
+                <label class="field-label">Tipo</label>
+                <select class="select select-bordered w-full" th:field="*{type}">
+                    <option th:each="type : ${mapPointTypes}" th:value="${type}" th:text="${type}">PARKING</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="field-label">Latitud</label><input class="input input-bordered w-full" th:field="*{latitude}" type="number" step="0.0000001" required></div>
+                <div><label class="field-label">Longitud</label><input class="input input-bordered w-full" th:field="*{longitude}" type="number" step="0.0000001" required></div>
+            </div>
+            <div class="md:col-span-2">
+                <label class="field-label">Descripción</label>
+                <textarea class="textarea textarea-bordered w-full min-h-32" th:field="*{description}" placeholder="Descripción del punto visible en el popup del mapa"></textarea>
+            </div>
+            <div class="admin-form-actions md:col-span-2">
+                <a class="btn btn-outline btn-primary" th:href="@{/admin/map-points}">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar punto</button>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

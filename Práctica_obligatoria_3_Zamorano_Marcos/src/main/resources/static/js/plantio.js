@@ -211,3 +211,83 @@ document.addEventListener('click', (event) => {
     questionInput.value = button.dataset.question || '';
     questionInput.focus();
 });
+
+/**
+ * Inicializa confirmaciones administrativas con modal DaisyUI en lugar del confirm nativo del navegador.
+ * Autor: Marcos Zamorano Lasso
+ */
+function initAdminConfirmModals() {
+    document.querySelectorAll('form[data-confirm]').forEach(form => {
+        form.addEventListener('submit', event => {
+            if (form.dataset.confirmed === 'true') return;
+            event.preventDefault();
+            openPlantioConfirmModal(form.dataset.confirm || '¿Confirmar operación?', () => {
+                form.dataset.confirmed = 'true';
+                form.submit();
+            });
+        });
+    });
+}
+
+/**
+ * Abre un modal DaisyUI reutilizable para confirmar acciones destructivas.
+ * Autor: Marcos Zamorano Lasso
+ * @param {string} message mensaje mostrado.
+ * @param {Function} onConfirm acción confirmada.
+ */
+function openPlantioConfirmModal(message, onConfirm) {
+    let dialog = document.getElementById('plantioConfirmDialog');
+    if (!dialog) {
+        dialog = document.createElement('dialog');
+        dialog.id = 'plantioConfirmDialog';
+        dialog.className = 'modal';
+        dialog.innerHTML = `
+            <div class="modal-box plantio-confirm-box">
+                <div class="plantio-confirm-icon">!</div>
+                <h3 class="text-2xl font-black">Confirmar operación</h3>
+                <p class="py-4 text-slate-600" id="plantioConfirmMessage"></p>
+                <div class="modal-action">
+                    <button type="button" class="btn btn-outline btn-primary" id="plantioConfirmCancel">Cancelar</button>
+                    <button type="button" class="btn btn-error" id="plantioConfirmAccept">Eliminar</button>
+                </div>
+            </div>`;
+        document.body.appendChild(dialog);
+    }
+    dialog.querySelector('#plantioConfirmMessage').textContent = message;
+    const accept = dialog.querySelector('#plantioConfirmAccept');
+    const cancel = dialog.querySelector('#plantioConfirmCancel');
+    accept.textContent = 'Eliminar';
+    accept.onclick = () => {
+        dialog.close();
+        onConfirm();
+    };
+    cancel.onclick = () => dialog.close();
+    dialog.showModal();
+}
+
+/**
+ * Valida en cliente el tamaño máximo de archivos administrativos antes de enviarlos.
+ * Autor: Marcos Zamorano Lasso
+ */
+function initAdminFileInputs() {
+    document.querySelectorAll('input[type="file"][data-max-file-size]').forEach(input => {
+        input.addEventListener('change', () => {
+            const max = Number(input.dataset.maxFileSize || 0);
+            const file = input.files && input.files[0];
+            if (!file || !max || file.size <= max) return;
+            input.value = '';
+            openPlantioConfirmModal(`El archivo supera el máximo permitido de ${Math.round(max / 1024 / 1024)}MB. Selecciona una imagen más ligera.`, () => {});
+            const accept = document.getElementById('plantioConfirmAccept');
+            if (accept) accept.textContent = 'Entendido';
+        });
+    });
+}
+
+/**
+ * Arranque adicional de utilidades de administración.
+ * Autor: Marcos Zamorano Lasso
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    initAdminConfirmModals();
+    initAdminFileInputs();
+});

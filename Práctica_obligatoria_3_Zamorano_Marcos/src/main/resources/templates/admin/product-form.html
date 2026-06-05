@@ -1,17 +1,63 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Formulario de producto.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Producto')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>Producto</h1><form th:action="@{/admin/products}" th:object="${item}" method="post" class="card plantio-card p-6"><input type="hidden" th:field="*{id}"><label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{name}" required><label>Descripción</label><textarea class="textarea textarea-bordered w-full mb-2" th:field="*{description}"></textarea><label>Precio</label><input class="input input-bordered w-full mb-2" th:field="*{price}"><label>Stock</label><input class="input input-bordered w-full mb-2" th:field="*{stock}" type="number"><label>Categoría</label><input class="input input-bordered w-full mb-2" th:field="*{category}"><label>Imagen</label><input class="input input-bordered w-full mb-2" th:field="*{imageUrl}"><div class="flex items-center gap-3 mb-3"><input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}"><label class="font-semibold text-slate-700">Activo</label></div><button class="btn btn-primary">Guardar</button></form>
+    <div th:replace="~{fragments/common :: backLink('/admin/products', 'Volver a productos')}"></div>
+    <section class="admin-form-card">
+        <div class="admin-form-heading">
+            <p>Administración</p>
+            <h1>Producto</h1>
+            <span>Gestiona merchandising, stock, categoría e imagen comercial.</span>
+        </div>
+        <form th:action="@{/admin/products}" th:object="${item}" method="post" enctype="multipart/form-data" class="admin-form-grid">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{imageUrl}">
+            <div class="md:col-span-2">
+                <label class="field-label">Nombre</label>
+                <input class="input input-bordered w-full" th:field="*{name}" required placeholder="Nombre del producto">
+            </div>
+            <div>
+                <label class="field-label">Categoría</label>
+                <select class="select select-bordered w-full" th:field="*{category}">
+                    <option th:each="category : ${productCategories}" th:value="${category}" th:text="${category}">Textil</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="field-label">Precio</label><input class="input input-bordered w-full" th:field="*{price}" type="number" step="0.01" min="0"></div>
+                <div><label class="field-label">Stock</label><input class="input input-bordered w-full" th:field="*{stock}" type="number" min="0"></div>
+            </div>
+            <div class="md:col-span-2">
+                <label class="field-label">Imagen del producto</label>
+                <div class="admin-file-zone">
+                    <input class="file-input file-input-bordered w-full" type="file" name="productImage" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-max-file-size="67108864">
+                    <small>PNG, JPG, WEBP o SVG. Tamaño máximo 64MB.</small>
+                    <div class="admin-current-image" th:if="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}">
+                        <img th:src="*{imageUrl}" alt="Imagen actual"><span th:text="*{imageUrl}">Ruta actual</span>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-2">
+                <label class="field-label">Descripción</label>
+                <textarea class="textarea textarea-bordered w-full min-h-32" th:field="*{description}" placeholder="Descripción visible en la tienda"></textarea>
+            </div>
+            <label class="admin-check-card md:col-span-2">
+                <input class="checkbox checkbox-primary" type="checkbox" th:field="*{active}">
+                <span><strong>Producto activo</strong><small>Se mostrará en la tienda pública si está activo.</small></span>
+            </label>
+            <div class="admin-form-actions md:col-span-2">
+                <a class="btn btn-outline btn-primary" th:href="@{/admin/products}">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar producto</button>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

@@ -1,26 +1,62 @@
 <!--
-  El Plantío 360 - Administración.
+  El Plantío 360 - Formulario de usuario.
   Autor: Marcos Zamorano Lasso
   Práctica 3 - Sistemas Distribuidos
 -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Admin')}"></head>
+<head th:replace="~{fragments/common :: head('Admin · Usuario')}"></head>
 <body>
 <nav th:replace="~{fragments/common :: navbar}"></nav>
 <div th:replace="~{fragments/common :: alerts}"></div>
 <main class="app-shell py-10">
-<div th:replace="~{fragments/common :: backLink('/admin', 'Volver al panel de administración')}"></div>
-<h1>Usuario</h1><form th:action="@{/admin/users}" th:object="${item}" method="post" class="card plantio-card p-6">
-<input type="hidden" th:field="*{id}">
-<label>Nombre</label><input class="input input-bordered w-full mb-2" th:field="*{firstName}" required>
-<label>Apellidos</label><input class="input input-bordered w-full mb-2" th:field="*{lastName}" required>
-<label>Email</label><input class="input input-bordered w-full mb-2" th:field="*{email}" required>
-<label>Contraseña</label><input class="input input-bordered w-full mb-2" th:field="*{password}" type="password" placeholder="Vacío conserva la actual">
-<label>Rol</label><select class="select select-bordered w-full mb-2" th:field="*{role}"><option>ROLE_USER</option><option>ROLE_ADMIN</option></select>
-<label>Teléfono</label><input class="input input-bordered w-full mb-2" th:field="*{phone}">
-<div class="flex items-center gap-3 mb-3"><input class="checkbox checkbox-primary" type="checkbox" th:field="*{enabled}"><label class="font-semibold text-slate-700">Activo</label></div>
-<button class="btn btn-primary">Guardar</button></form>
+    <div th:replace="~{fragments/common :: backLink('/admin/users', 'Volver a usuarios')}"></div>
+    <section class="admin-form-card">
+        <div class="admin-form-heading">
+            <p>Administración</p>
+            <h1>Usuario</h1>
+            <span>Gestiona datos de perfil, rol y estado de la cuenta. Las contraseñas no son editables desde administración.</span>
+        </div>
+        <form th:action="@{/admin/users}" th:object="${item}" method="post" class="admin-form-grid">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{avatarUrl}">
+            <div>
+                <label class="field-label">Nombre</label>
+                <input class="input input-bordered w-full" th:field="*{firstName}" required placeholder="Ej: Marcos">
+            </div>
+            <div>
+                <label class="field-label">Apellidos</label>
+                <input class="input input-bordered w-full" th:field="*{lastName}" required placeholder="Ej: Zamorano Lasso">
+            </div>
+            <div class="md:col-span-2">
+                <label class="field-label">Correo electrónico</label>
+                <input class="input input-bordered w-full" th:field="*{email}" type="email" required placeholder="usuario@plantio360.local">
+            </div>
+            <div class="md:col-span-2 admin-info-card">
+                <strong>Contraseña gestionada por el sistema</strong>
+                <small>El administrador no puede consultar ni modificar contraseñas. Al crear un usuario manualmente se asigna la contraseña temporal <code>user1234</code>, siempre almacenada hasheada con BCrypt.</small>
+            </div>
+            <div>
+                <label class="field-label">Teléfono</label>
+                <input class="input input-bordered w-full" th:field="*{phone}" placeholder="+34 999 99 99 99">
+            </div>
+            <div>
+                <label class="field-label">Rol</label>
+                <select class="select select-bordered w-full" th:field="*{role}">
+                    <option value="ROLE_USER">Usuario</option>
+                    <option value="ROLE_ADMIN">Administrador</option>
+                </select>
+            </div>
+            <label class="admin-check-card">
+                <input class="checkbox checkbox-primary" type="checkbox" th:field="*{enabled}">
+                <span><strong>Usuario activo</strong><small>Permite iniciar sesión y acceder a las funcionalidades privadas.</small></span>
+            </label>
+            <div class="admin-form-actions md:col-span-2">
+                <a class="btn btn-outline btn-primary" th:href="@{/admin/users}">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar usuario</button>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{fragments/common :: footer}"></footer>
 <div th:replace="~{fragments/common :: scripts}"></div>

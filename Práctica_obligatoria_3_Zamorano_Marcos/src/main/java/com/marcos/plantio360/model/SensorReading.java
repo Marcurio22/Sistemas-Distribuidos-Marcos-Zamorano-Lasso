@@ -10,6 +10,7 @@ package com.marcos.plantio360.model;
 import java.io.Serializable;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -43,6 +44,7 @@ public class SensorReading implements Serializable {
     @Column(nullable = false, precision = 10, scale = 7)
     private BigDecimal longitude;
     @Column(nullable = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime capturedAt;
 
     /**

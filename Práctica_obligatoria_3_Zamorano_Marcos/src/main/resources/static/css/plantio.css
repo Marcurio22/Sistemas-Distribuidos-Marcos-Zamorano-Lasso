@@ -531,3 +531,66 @@ body::after {
     background: #221c35;
     border-color: #221c35;
 }
+
+
+/* Admin list actions and stable match cards. */
+.admin-list-title { align-items: flex-end; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: .55rem; justify-content: flex-end; }
+.admin-row-actions { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+.admin-row-actions form { margin: 0; }
+.admin-table th { color: #475569; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
+.match-card { display: flex; flex-direction: column; min-height: 100%; }
+.match-card .match-title { min-height: 3.7rem; }
+.match-card .match-data-grid { margin-bottom: 1rem; }
+.match-card > .btn { margin-top: auto !important; }
+@media (max-width: 768px) { .admin-list-title { align-items: flex-start; } .admin-actions { justify-content: flex-start; } }
+
+/* Polished administration forms and actions. */
+.admin-form-card {
+    width: min(100%, 1040px);
+    margin: 0 auto;
+    border-radius: 30px;
+    background: rgba(255,255,255,.97);
+    border: 1px solid rgba(15,23,42,.08);
+    box-shadow: var(--plantio-shadow);
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+.admin-form-heading { margin-bottom: 1.35rem; }
+.admin-form-heading p { margin: 0 0 .35rem; text-transform: uppercase; letter-spacing: .22em; font-size: .78rem; font-weight: 1000; color: var(--plantio-green-dark); }
+.admin-form-heading h1 { margin: 0; font-size: clamp(2.2rem, 4vw, 3rem); line-height: 1; font-weight: 1000; letter-spacing: -.04em; color: var(--plantio-ink); }
+.admin-form-heading span { display: block; margin-top: .65rem; color: #64748b; font-weight: 650; }
+.admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.admin-form-grid .input, .admin-form-grid .select, .admin-form-grid .textarea, .admin-form-grid .file-input { border-radius: 14px; background: rgba(255,255,255,.98); }
+.admin-form-grid .input:focus, .admin-form-grid .select:focus, .admin-form-grid .textarea:focus, .admin-form-grid .file-input:focus { border-color: var(--plantio-green-dark); box-shadow: 0 0 0 4px rgba(47,139,63,.14); }
+.admin-file-zone { border-radius: 22px; border: 1px dashed rgba(47,139,63,.32); background: linear-gradient(135deg, #f8fafc, #eef8f1); padding: 1rem; }
+.admin-file-zone small { display: block; margin-top: .55rem; color: #64748b; font-weight: 650; }
+.admin-current-image { margin-top: .85rem; display: flex; align-items: center; gap: .8rem; color: #64748b; font-size: .85rem; overflow-wrap: anywhere; }
+.admin-current-image img { width: 4.5rem; height: 4.5rem; object-fit: contain; border-radius: 18px; background: #fff; border: 1px solid rgba(15,23,42,.08); padding: .45rem; }
+.admin-check-card { display: flex; align-items: center; gap: .85rem; border-radius: 18px; background: #f8fafc; border: 1px solid rgba(15,23,42,.07); padding: .9rem 1rem; }
+.admin-check-card strong { display: block; color: var(--plantio-ink); font-weight: 950; }
+.admin-check-card small { display: block; margin-top: .1rem; color: #64748b; font-weight: 650; }
+.admin-form-actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: .25rem; }
+.admin-export-btn { gap: .45rem; min-height: 3rem; border-radius: 12px; font-weight: 900; }
+.admin-export-icon { font-size: 1rem; line-height: 1; }
+.plantio-confirm-box { border-radius: 28px; border: 1px solid rgba(15,23,42,.08); box-shadow: var(--plantio-shadow); }
+.plantio-confirm-icon { width: 3.2rem; height: 3.2rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #fee2e2; color: #dc2626; font-weight: 1000; font-size: 1.4rem; margin-bottom: .85rem; }
+.match-card { height: 100%; }
+.match-card .match-data-grid { margin-top: auto; }
+.match-card .btn { align-self: stretch; }
+@media (max-width: 760px) {
+    .admin-form-grid { grid-template-columns: 1fr; }
+    .admin-form-actions { flex-direction: column; }
+    .admin-form-actions .btn { width: 100%; }
+}
+
+/* Admin informational panels and refined form feedback. */
+.admin-info-card {
+    border-radius: 18px;
+    border: 1px solid rgba(47,139,63,.18);
+    background: linear-gradient(135deg, #eefaf0, #f8fafc);
+    padding: 1rem 1.1rem;
+    box-shadow: 0 10px 24px rgba(15,23,42,.05);
+}
+.admin-info-card strong { display:block; color: var(--plantio-ink); font-weight: 950; }
+.admin-info-card small { display:block; color:#475569; margin-top:.25rem; line-height:1.55; }
+.admin-info-card code { background:#e2f5e7; color:var(--plantio-green-dark); padding:.1rem .35rem; border-radius:.45rem; font-weight:900; }

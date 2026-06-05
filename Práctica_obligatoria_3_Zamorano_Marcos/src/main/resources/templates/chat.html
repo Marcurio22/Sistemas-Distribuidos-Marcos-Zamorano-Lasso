@@ -24,7 +24,7 @@
                 </div>
                 <span th:text="${message.content}">Mensaje</span>
             </div>
-            <form sec:authorize="hasRole('ADMIN')" th:action="@{/chat/{id}/delete(id=${message.id})}" method="post" class="chat-delete-form">
+            <form sec:authorize="hasRole('ADMIN')" th:action="@{/chat/{id}/delete(id=${message.id})}" method="post" class="chat-delete-form" data-confirm="¿Eliminar mensaje del muro?">
                 <button class="btn btn-xs btn-error btn-outline" type="submit" title="Eliminar mensaje">Eliminar</button>
             </form>
         </div>
