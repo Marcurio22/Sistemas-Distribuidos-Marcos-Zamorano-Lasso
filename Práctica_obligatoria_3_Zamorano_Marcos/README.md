@@ -45,6 +45,21 @@ URLs principales:
 - Flask sensores: http://localhost:5000/health
 - SonarQube: http://localhost:9000
 
+## Configuración mediante `.env`
+
+El proyecto está preparado para arrancar con Docker Compose sin configuración manual compleja. Aun así, algunas funcionalidades opcionales, como la integración con Gemini, se configuran mediante variables de entorno.
+
+Por seguridad, he incluido un archivo `.env.example` con la estructura necesaria y que cada usuario cree su propio `.env` local.
+
+### Crear el archivo `.env`
+
+Desde la raíz del proyecto:
+
+```bash
+cp .env.example .env
+```
+(Si se quiere usar mi API Key, deberás revisar la entrega de UBUVirtual)
+
 ## Usuarios de prueba
 
 | Rol | Email | Contraseña |
